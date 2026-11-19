@@ -490,6 +490,32 @@
               <p class="text-xs text-slate-500 mt-0.5">Input custom applicant details to test the underwriting algorithm.</p>
             </div>
 
+            <!-- Partner Lending Institution Policy Benchmark (Option 1) -->
+            <div class="bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-slate-50 p-4 rounded-xl border border-blue-200/80 shadow-2xs space-y-2.5">
+              <div class="flex items-center justify-between">
+                <label class="text-xs font-bold text-blue-950 uppercase tracking-wider flex items-center space-x-1.5">
+                  <i data-lucide="building-2" class="w-4 h-4 text-blue-700"></i>
+                  <span>Lending Institution Risk Policy Benchmark</span>
+                </label>
+                <span id="bank-policy-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-blue-100 text-blue-900 border border-blue-200">
+                  HDFC Standard (Risk Ceiling 28%)
+                </span>
+              </div>
+
+              <select id="sel-bank-institution" onchange="changeBankInstitution()" class="w-full text-xs font-bold p-2.5 rounded-lg border border-slate-300 bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-2xs font-sans cursor-pointer">
+                <option value="hdfc" selected>🏛️ HDFC Bank Benchmark (Tier-1 Private &bull; Conservative Prime &bull; 28% Risk Ceiling)</option>
+                <option value="sbi">🏦 State Bank of India (SBI) Benchmark (Public Sector Sovereign &bull; Mass Retail &bull; 35% Risk Ceiling)</option>
+                <option value="icici">⚡ ICICI &amp; Axis Bank Benchmark (Private Sector Agility &bull; Agile Salaried &bull; 38% Risk Ceiling)</option>
+                <option value="nbfc">🚀 Digital NBFC Tier (Bajaj &amp; Tata Capital Standard &bull; Dynamic Risk Pricing &bull; 45% Risk Ceiling)</option>
+              </select>
+
+              <div class="flex items-start justify-between text-[11px] pt-1 border-t border-blue-200/50">
+                <span class="text-slate-600 leading-relaxed" id="bank-policy-desc">
+                  <strong>Policy Mandate:</strong> Strict prime underwriting ceiling (28.0% default cutoff), CIBIL &ge; 720 benchmark, and conservative DTI limit (35%).
+                </span>
+              </div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <label class="block text-xs font-semibold text-slate-700 mb-1.5">Annual Verified Income (₹)</label>
@@ -1054,11 +1080,11 @@
         <div class="flex items-start justify-between border-b-2 border-slate-900 pb-5">
           <div class="space-y-1">
             <div class="flex items-center space-x-2">
-              <span class="text-xl font-black text-blue-950 tracking-tight font-serif">FinShield Bank</span>
-              <span class="px-1.5 py-0.5 rounded bg-blue-100 text-blue-900 text-[10px] font-bold">RBI Regulated NBFC-ICC</span>
+              <span class="text-xl font-black text-blue-950 tracking-tight font-serif" id="doc-bank-name">FinShield Bank &bull; HDFC Bank Policy Benchmark</span>
+              <span class="px-1.5 py-0.5 rounded bg-blue-100 text-blue-900 text-[10px] font-bold" id="doc-bank-tag">Scheduled Commercial Bank Co-Lending</span>
             </div>
-            <p class="text-[11px] text-slate-500">Institutional Credit Underwriting &amp; Risk Advisory Department</p>
-            <p class="text-[10px] text-slate-400">Head Office: FinShield Tower, Bandra Kurla Complex (BKC), Mumbai 400051</p>
+            <p class="text-[11px] text-slate-600 font-medium" id="doc-partner-sub">Underwritten under HDFC Bank Retail Underwriting Policy Standards</p>
+            <p class="text-[10px] text-slate-400">Head Office: FinShield Tower, Bandra Kurla Complex (BKC), Mumbai 400051 &bull; Certified for RBI Digital Lending Guidelines</p>
           </div>
           <div class="text-right space-y-1 font-mono text-[11px]">
             <p class="font-bold text-slate-900" id="doc-ref-id">REF: FIN/2026/0942</p>
@@ -1177,6 +1203,77 @@
     const statTotalStreamed = document.getElementById('stat-total-streamed');
     const statApprovalRate = document.getElementById('stat-approval-rate');
 
+    
+    // ==========================================================
+    // MULTI-BANK LENDING INSTITUTION POLICIES (OPTION 1)
+    // ==========================================================
+    const BANK_POLICIES = {
+      hdfc: {
+        name: "HDFC Bank Benchmark",
+        badge: "HDFC Standard (Risk Ceiling 28%)",
+        desc: "<strong>Policy Mandate:</strong> Strict prime underwriting ceiling (28.0% default cutoff), CIBIL &ge; 720 benchmark, and conservative DTI limit (35%).",
+        riskCeiling: 0.28,
+        prefCibil: 720,
+        maxDti: 35,
+        baseAprRange: "8.45% – 9.25%",
+        refPrefix: "REF-HDFC-2026",
+        letterheadTitle: "FinShield &bull; HDFC Bank Lending Benchmark",
+        regulatorySub: "Underwritten via FinShield Credit Engine &bull; Tier-1 Private Bank Risk Appetite Framework"
+      },
+      sbi: {
+        name: "State Bank of India (SBI) Benchmark",
+        badge: "SBI Standard (Risk Ceiling 35%)",
+        desc: "<strong>Policy Mandate:</strong> Sovereign-backed public retail lending framework (35.0% risk ceiling), CIBIL &ge; 680 benchmark, and max DTI 45%.",
+        riskCeiling: 0.35,
+        prefCibil: 680,
+        maxDti: 45,
+        baseAprRange: "8.75% – 10.50%",
+        refPrefix: "REF-SBI-2026",
+        letterheadTitle: "FinShield &bull; State Bank of India (SBI) Benchmark",
+        regulatorySub: "Underwritten via FinShield Credit Engine &bull; Public Sector Bank Risk Framework"
+      },
+      icici: {
+        name: "ICICI & Axis Bank Benchmark",
+        badge: "ICICI/Axis Standard (Risk Ceiling 38%)",
+        desc: "<strong>Policy Mandate:</strong> Agile private retail credit policy (38.0% risk ceiling), CIBIL &ge; 660 benchmark, and flexible tenure underwriting.",
+        riskCeiling: 0.38,
+        prefCibil: 660,
+        maxDti: 42,
+        baseAprRange: "9.50% – 11.75%",
+        refPrefix: "REF-ICICI-2026",
+        letterheadTitle: "FinShield &bull; ICICI / Axis Bank Benchmark",
+        regulatorySub: "Underwritten via FinShield Credit Engine &bull; Private Retail Credit Framework"
+      },
+      nbfc: {
+        name: "Digital NBFC Tier (Bajaj / Tata Standard)",
+        badge: "NBFC Standard (Risk Ceiling 45%)",
+        desc: "<strong>Policy Mandate:</strong> High-velocity risk-based pricing (45.0% risk ceiling), CIBIL &ge; 620 benchmark, and collateral-free personal credit.",
+        riskCeiling: 0.45,
+        prefCibil: 620,
+        maxDti: 50,
+        baseAprRange: "13.50% – 18.00%",
+        refPrefix: "REF-NBFC-2026",
+        letterheadTitle: "FinShield &bull; Digital NBFC Consortium Benchmark",
+        regulatorySub: "Underwritten via FinShield Credit Engine &bull; Digital Lending Framework"
+      }
+    };
+
+    let selectedBankKey = 'hdfc';
+
+    function changeBankInstitution() {
+      const sel = document.getElementById('sel-bank-institution');
+      if (sel) selectedBankKey = sel.value;
+      const policy = BANK_POLICIES[selectedBankKey] || BANK_POLICIES['hdfc'];
+
+      const badge = document.getElementById('bank-policy-badge');
+      if (badge) badge.innerHTML = policy.badge;
+
+      const desc = document.getElementById('bank-policy-desc');
+      if (desc) desc.innerHTML = policy.desc;
+
+      recalculateInteractive();
+    }
+
     // Underwriting Inputs
     const inIncome = document.getElementById('in-income');
     const inLoan = document.getElementById('in-loan');
@@ -1207,6 +1304,11 @@
 
     // Modal DOM References
     const docModal = document.getElementById('doc-modal');
+    const docBankName = document.getElementById('doc-bank-name');
+    const docPartnerSub = document.getElementById('doc-partner-sub');
+    const selBankInstitution = document.getElementById('sel-bank-institution');
+    const bankPolicyBadge = document.getElementById('bank-policy-badge');
+    const bankPolicyDesc = document.getElementById('bank-policy-desc');
     const docRefId = document.getElementById('doc-ref-id');
     const docDate = document.getElementById('doc-date');
     const docBadgeStatus = document.getElementById('doc-badge-status');
@@ -1491,26 +1593,31 @@
       if (sigBurden) sigBurden.textContent = payment_burden.toFixed(1) + '%';
       if (sigRatio) sigRatio.textContent = income_to_loan.toFixed(1) + 'x';
 
-      if (prob < 0.35) {
+      const policy = BANK_POLICIES[selectedBankKey] || BANK_POLICIES['hdfc'];
+      const riskCeiling = policy.riskCeiling;
+      const ceilingPct = (riskCeiling * 100).toFixed(0);
+
+      if (prob < riskCeiling) {
         if (decisionBanner) decisionBanner.className = "w-full py-3 px-4 rounded-lg font-bold text-xs tracking-wider uppercase mb-5 flex items-center justify-center space-x-2 bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs";
-        if (decisionText) decisionText.textContent = "UNDERWRITING: APPROVED (Prime Tier)";
+        if (decisionText) decisionText.textContent = `UNDERWRITING: APPROVED (${policy.name})`;
         if (gaugeBar) gaugeBar.style.stroke = "#059669";
-        if (decisionSub) decisionSub.innerHTML = `Calibrated default risk of <strong class="text-emerald-800">${probPct}%</strong> is well within the institutional ceiling (35.0%).`;
+        if (decisionSub) decisionSub.innerHTML = `Calibrated default risk of <strong class="text-emerald-800">${probPct}%</strong> satisfies <strong>${policy.name}</strong>'s risk ceiling (${ceilingPct}%).`;
         if (adverseCard) adverseCard.classList.add('hidden');
-        if (btnDirectDownloadLabel) btnDirectDownloadLabel.textContent = "Download Sanction Letter (.PDF)";
+        if (btnDirectDownloadLabel) btnDirectDownloadLabel.textContent = `Download ${policy.name} Sanction (.PDF)`;
       } else {
         if (decisionBanner) decisionBanner.className = "w-full py-3 px-4 rounded-lg font-bold text-xs tracking-wider uppercase mb-5 flex items-center justify-center space-x-2 bg-rose-50 text-rose-800 border border-rose-200 shadow-2xs";
-        if (decisionText) decisionText.textContent = "UNDERWRITING: DECLINED (Subprime Tier)";
+        if (decisionText) decisionText.textContent = `UNDERWRITING: DECLINED (${policy.name})`;
         if (gaugeBar) gaugeBar.style.stroke = "#e11d48";
-        if (decisionSub) decisionSub.innerHTML = `Calibrated default risk of <strong class="text-rose-700">${probPct}%</strong> exceeds the risk tolerance ceiling of 35.0%.`;
-        if (btnDirectDownloadLabel) btnDirectDownloadLabel.textContent = "Download Declination Notice (.PDF)";
+        if (decisionSub) decisionSub.innerHTML = `Calibrated default risk of <strong class="text-rose-700">${probPct}%</strong> exceeds <strong>${policy.name}</strong>'s risk tolerance ceiling of ${ceilingPct}%.`;
+        if (btnDirectDownloadLabel) btnDirectDownloadLabel.textContent = `Download Declination Notice (.PDF)`;
 
         const reasons = [];
+        reasons.push(`Risk probability (${probPct}%) exceeds ${policy.name}'s maximum risk tolerance ceiling (${ceilingPct}%)`);
         if (delinq > 0) reasons.push(`Prior 30+ day payment delinquencies reported on credit bureau (${delinq} missed EMIs)`);
-        if (score < 660) reasons.push(`CIBIL / FICO bureau score (${score}) below prime risk cutoff (660)`);
+        if (score < policy.prefCibil) reasons.push(`CIBIL score (${score}) is below ${policy.name}'s preferred prime cutoff (${policy.prefCibil})`);
         if (util > 0.45) reasons.push(`Credit card balance utilization is excessively high (${(util * 100).toFixed(0)}%)`);
-        if (dti > 0.38) reasons.push(`Total monthly EMI obligations exceed prudent limit (${(dti * 100).toFixed(0)}% DTI)`);
-        if (income_to_loan < 2.5) reasons.push(`Requested loan (${formatINR(loan)}) is disproportionate to annual income (${formatINR(income)})`);
+        if (dti > (policy.maxDti / 100)) reasons.push(`Debt-to-Income (${(dti * 100).toFixed(0)}%) exceeds ${policy.name}'s prudent ceiling (${policy.maxDti}%)`);
+        if (income_to_loan < 2.5) reasons.push(`Requested loan (${formatINR(loan)}) is disproportionate to annual verified income (${formatINR(income)})`);
 
         if (adverseList) {
           adverseList.innerHTML = '';
@@ -1539,10 +1646,13 @@
       const delinq = parseInt(inDelinq ? inDelinq.value : '0') || 0;
       const rate = parseFloat(inRate ? inRate.value : '10.5') || 10.5;
 
+      const policy = BANK_POLICIES[selectedBankKey] || BANK_POLICIES['hdfc'];
       const randomHash = '0x' + Array.from({length: 16}, () => Math.floor(Math.random()*16).toString(16)).join('');
-      const randomRef = 'REF-RBI-' + Math.floor(100000 + Math.random() * 900000);
+      const randomRef = `${policy.refPrefix}-${Math.floor(100000 + Math.random() * 900000)}`;
       const todayStr = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 
+      if (docBankName) docBankName.innerHTML = policy.letterheadTitle;
+      if (docPartnerSub) docPartnerSub.innerHTML = policy.regulatorySub;
       if (docRefId) docRefId.textContent = randomRef;
       if (docDate) docDate.textContent = `Date: ${todayStr}`;
       if (docIncome) docIncome.textContent = formatINR(income);
