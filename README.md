@@ -185,5 +185,24 @@ az ml job create --file pipelines/pipeline_job.yaml --resource-group rg-finshiel
 
 ---
 
+## ⚠️ System Limitations & Synthetic Data Disclosure
+
+In compliance with banking data privacy regulations and Model Risk Management (MRM) standards:
+
+1. **Synthetic Data Generation for Privacy Protection:**
+   - In accordance with the **Digital Personal Data Protection (DPDP) Act 2023**, **RBI KYC/Data Localization mandates**, and **GLBA/GDPR**, no proprietary customer Personally Identifiable Information (PII) or real bank accounts are used in this repository.
+   - All 10,000+ credit records were programmatically generated using multivariate statistical correlation structures (`src/generate_data.py`), accurately modeling empirical Indian retail credit parameters (CIBIL score distributions, debt-to-income ratios, revolving credit card utilization, and baseline 15.45% default rates).
+
+2. **Absence of Alternative / Unstructured Credit Data:**
+   - The current model relies on traditional bureau and capacity ratios. Real-world commercial lending increasingly integrates alternative underwriting signals (e.g., Account Aggregator bank statement analysis, GST return filings, utility bill regularity), which are not present in the synthetic dataset.
+
+3. **Macroeconomic Feedback Loops:**
+   - While the platform features a Basel III stress-testing simulator, synthetic data cannot fully model black-swan contagion effects, sudden localized regulatory moratoriums, or industry-specific systemic shocks without live production bureau feeds.
+
+4. **Institutional Prototype Scope:**
+   - FinShield is an enterprise architecture proof-of-concept designed for cloud evaluation and regulatory sandbox simulation; production deployment within a bank requires integration with core banking systems (e.g., Finacle, BaNCS) and formal sign-off from an independent Model Validation Committee.
+
+---
+
 ## 📄 License
 Distributed under the Apache 2.0 License.
