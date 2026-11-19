@@ -1,0 +1,9 @@
+{
+  "roc_auc": 0.8716,
+  "pr_auc": 0.6158,
+  "gini_coefficient": 0.7432,
+  "brier_score": 0.0878,
+  "f1_score": 0.5831,
+  "test_records": 2000,
+  "test_default_rate": 0.1545
+}

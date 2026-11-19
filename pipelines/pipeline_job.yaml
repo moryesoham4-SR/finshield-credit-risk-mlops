@@ -1,0 +1,43 @@
+$schema: https://azuremlschemas.azureedge.net/latest/pipelineJob.schema.json
+type: pipeline
+display_name: finshield-credit-risk-training-pipeline
+experiment_name: credit-risk-scoring
+
+settings:
+  default_compute: azureml:cpu-cluster
+  continue_on_step_failure: false
+
+inputs:
+  raw_credit_data:
+    type: uri_file
+    path: azureml:credit-applications-raw:1
+
+jobs:
+  validate_data_job:
+    type: command
+    component: azureml:finshield_validate_component:1
+    inputs:
+      input_data: ${{parent.inputs.raw_credit_data}}
+    outputs:
+      validation_report:
+        type: uri_file
+
+  feature_engineering_job:
+    type: command
+    component: azureml:finshield_feature_engineering_component:1
+    inputs:
+      raw_data: ${{parent.inputs.raw_credit_data}}
+    outputs:
+      processed_data:
+        type: uri_file
+
+  train_and_calibrate_job:
+    type: command
+    component: azureml:finshield_train_component:1
+    inputs:
+      processed_data: ${{parent.jobs.feature_engineering_job.outputs.processed_data}}
+    outputs:
+      model_output:
+        type: uri_folder
+      metrics_output:
+        type: uri_file
