@@ -1128,6 +1128,9 @@
     // Initialize Lucide Icons
     lucide.createIcons();
 
+    // ==========================================================
+    // UTILITY FUNCTIONS
+    // ==========================================================
     function formatINR(val) {
       return '₹' + Number(val).toLocaleString('en-IN');
     }
@@ -1163,46 +1166,103 @@
     }
 
     // ==========================================================
-    // HIGH-VELOCITY STREAMING SIMULATOR (Configurable Speed)
+    // DOM REFERENCES (ALL DECLARED AT TOP LEVEL)
     // ==========================================================
-    let isStreaming = true;
-    let streamInterval = null;
-    let streamSpeedMs = 500; // Default to 0.5 sec (High-Velocity Mode)
-    let totalStreamedCount = 1842;
-    let approvedCount = 1551;
-
-    const streamTbody = document.getElementById('stream-tbody');
-    const statTotalStreamed = document.getElementById('stat-total-streamed');
-    const statApprovalRate = document.getElementById('stat-approval-rate');
+    // Stream DOM
     const streamStatusDot = document.getElementById('stream-status-dot');
     const streamStatusText = document.getElementById('stream-status-text');
     const btnToggleStream = document.getElementById('btn-toggle-stream');
     const feedSpeedLabel = document.getElementById('feed-speed-label');
+    const streamTbody = document.getElementById('stream-tbody');
+    const statTotalStreamed = document.getElementById('stat-total-streamed');
+    const statApprovalRate = document.getElementById('stat-approval-rate');
+
+    // Underwriting Inputs
+    const inIncome = document.getElementById('in-income');
+    const inLoan = document.getElementById('in-loan');
+    const inScore = document.getElementById('in-score');
+    const inUtil = document.getElementById('in-util');
+    const inDti = document.getElementById('in-dti');
+    const inDelinq = document.getElementById('in-delinq');
+    const inRate = document.getElementById('in-rate');
+    const inEmp = document.getElementById('in-emp');
+
+    // Underwriting Displays
+    const valScore = document.getElementById('val-score');
+    const valUtil = document.getElementById('val-util');
+    const valDti = document.getElementById('val-dti');
+    const lblIncomeWords = document.getElementById('lbl-income-in-words');
+    const lblLoanWords = document.getElementById('lbl-loan-in-words');
+    const decisionBanner = document.getElementById('decision-banner');
+    const decisionText = document.getElementById('decision-text');
+    const decisionSub = document.getElementById('decision-sub');
+    const gaugeBar = document.getElementById('gauge-bar');
+    const gaugeValue = document.getElementById('gauge-value');
+    const adverseCard = document.getElementById('adverse-card');
+    const adverseList = document.getElementById('adverse-list');
+    const sigStress = document.getElementById('sig-stress');
+    const sigBurden = document.getElementById('sig-burden');
+    const sigRatio = document.getElementById('sig-ratio');
+    const btnDirectDownloadLabel = document.getElementById('btn-direct-download-label');
+
+    // Modal DOM References
+    const docModal = document.getElementById('doc-modal');
+    const docRefId = document.getElementById('doc-ref-id');
+    const docDate = document.getElementById('doc-date');
+    const docBadgeStatus = document.getElementById('doc-badge-status');
+    const docTitle = document.getElementById('doc-title');
+    const docSubtitle = document.getElementById('doc-subtitle');
+    const docIncome = document.getElementById('doc-income');
+    const docLoan = document.getElementById('doc-loan');
+    const docScore = document.getElementById('doc-score');
+    const docDti = document.getElementById('doc-dti');
+    const docUtil = document.getElementById('doc-util');
+    const docDelinq = document.getElementById('doc-delinq');
+    const docBodySection = document.getElementById('doc-body-section');
+    const docHash = document.getElementById('doc-hash');
+
+    // What-If DOM References
+    const whatifSliderUtil = document.getElementById('whatif-slider-util');
+    const whatifSliderIncome = document.getElementById('whatif-slider-income');
+    const whatifValUtil = document.getElementById('whatif-val-util');
+    const whatifValIncome = document.getElementById('whatif-val-income');
+    const whatifRiskDisplay = document.getElementById('whatif-risk-display');
+    const whatifDeltaDisplay = document.getElementById('whatif-delta-display');
+    const whatifStatusBadge = document.getElementById('whatif-status-badge');
+
+    // ==========================================================
+    // STREAMING SIMULATOR
+    // ==========================================================
+    let isStreaming = true;
+    let streamInterval = null;
+    let streamSpeedMs = 500;
+    let totalStreamedCount = 1842;
+    let approvedCount = 1551;
 
     function setStreamSpeed(speedMs) {
       streamSpeedMs = speedMs;
-      
-      // Update UI buttons
       [500, 1000, 2000].forEach(s => {
         const btn = document.getElementById('speed-btn-' + s);
-        if (s === speedMs) {
-          btn.className = "px-2.5 py-1 rounded-md font-bold transition bg-emerald-600 text-white shadow-2xs";
-        } else {
-          btn.className = "px-2.5 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 transition";
+        if (btn) {
+          if (s === speedMs) {
+            btn.className = "px-2.5 py-1 rounded-md font-bold transition bg-emerald-600 text-white shadow-2xs";
+          } else {
+            btn.className = "px-2.5 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 transition";
+          }
         }
       });
 
       const secStr = (speedMs / 1000).toFixed(1) + 's';
-      feedSpeedLabel.textContent = `${secStr} Frequency`;
+      if (feedSpeedLabel) feedSpeedLabel.textContent = `${secStr} Frequency`;
       if (isStreaming) {
-        streamStatusText.textContent = `STREAMING (${secStr})`;
+        if (streamStatusText) streamStatusText.textContent = `STREAMING (${secStr})`;
         startStream();
       }
     }
 
     function generateSimulatedApplication() {
       totalStreamedCount++;
-      const idNum = 10000 + Math.floor(Math.random() * 90000);
+      const idNum = Math.floor(10000 + Math.random() * 90000);
       const appId = `APP-${idNum}`;
       
       const now = new Date();
@@ -1212,28 +1272,25 @@
       let income, loan, score, dti, util, delinq;
 
       if (!isSubprime) {
-        // Prime
-        income = Math.floor(600000 + Math.random() * 1900000);
-        loan = Math.floor(150000 + Math.random() * 650000);
-        score = Math.floor(680 + Math.random() * 140);
+        income = Math.floor(600000 + Math.random() * 2200000);
+        loan = Math.floor(150000 + Math.random() * 850000);
+        score = Math.floor(680 + Math.random() * 150);
         dti = (0.12 + Math.random() * 0.22).toFixed(2);
-        util = (0.08 + Math.random() * 0.30).toFixed(2);
+        util = (0.05 + Math.random() * 0.35).toFixed(2);
         delinq = 0;
       } else {
-        // Subprime
-        income = Math.floor(250000 + Math.random() * 200000);
-        loan = Math.floor(350000 + Math.random() * 550000);
-        score = Math.floor(490 + Math.random() * 130);
-        dti = (0.44 + Math.random() * 0.26).toFixed(2);
-        util = (0.65 + Math.random() * 0.38).toFixed(2);
+        income = Math.floor(250000 + Math.random() * 500000);
+        loan = Math.floor(350000 + Math.random() * 700000);
+        score = Math.floor(520 + Math.random() * 140);
+        dti = (0.36 + Math.random() * 0.30).toFixed(2);
+        util = (0.55 + Math.random() * 0.40).toFixed(2);
         delinq = Math.floor(1 + Math.random() * 3);
       }
 
-      // Risk score calculation
       const credit_deficit = Math.max(0, 850 - score) / 100.0;
       const revolving_stress = parseFloat(util) * credit_deficit;
       const delinquency_severity = delinq * (1.0 + parseFloat(dti));
-      const income_to_loan = income / loan;
+      const income_to_loan = income / Math.max(loan, 1);
 
       let z = -2.85;
       z += 4.5 * (parseFloat(dti) - 0.28);
@@ -1249,16 +1306,14 @@
       const approved = prob < 0.35;
       if (approved) approvedCount++;
 
-      // Adverse Action notice
       let reason = '—';
       if (!approved) {
-        if (delinq > 0) reason = `Delinquencies reported (${delinq} EMIs missed)`;
+        if (delinq > 0) reason = `Delinquencies reported (${delinq} missed EMIs)`;
         else if (score < 660) reason = `CIBIL score below prime cutoff (${score})`;
         else if (parseFloat(util) > 0.45) reason = `Credit card utilization high (${(util*100).toFixed(0)}%)`;
         else reason = `Monthly EMI obligation exceeds limit (${(dti*100).toFixed(0)}% DTI)`;
       }
 
-      // Add Row
       const tr = document.createElement('tr');
       tr.className = approved ? 'hover:bg-slate-50 transition' : 'bg-rose-50/40 hover:bg-rose-50 transition';
       tr.innerHTML = `
@@ -1277,30 +1332,37 @@
         <td class="py-2.5 px-4 text-slate-600 font-sans text-[11px]">${reason}</td>
       `;
 
-      streamTbody.insertBefore(tr, streamTbody.firstChild);
-
-      while (streamTbody.children.length > 14) {
-        streamTbody.removeChild(streamTbody.lastChild);
+      if (streamTbody) {
+        streamTbody.insertBefore(tr, streamTbody.firstChild);
+        while (streamTbody.children.length > 14) {
+          streamTbody.removeChild(streamTbody.lastChild);
+        }
       }
 
-      statTotalStreamed.textContent = totalStreamedCount.toLocaleString('en-IN');
-      const currentRate = ((approvedCount / totalStreamedCount) * 100).toFixed(1);
-      statApprovalRate.textContent = `${currentRate}%`;
+      if (statTotalStreamed) statTotalStreamed.textContent = totalStreamedCount.toLocaleString('en-IN');
+      if (statApprovalRate) {
+        const currentRate = ((approvedCount / totalStreamedCount) * 100).toFixed(1);
+        statApprovalRate.textContent = `${currentRate}%`;
+      }
     }
 
     function toggleStreaming() {
       isStreaming = !isStreaming;
       if (isStreaming) {
-        btnToggleStream.textContent = '⏸️ Pause';
-        streamStatusDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 live-dot';
-        streamStatusText.textContent = `STREAMING (${(streamSpeedMs/1000).toFixed(1)}s)`;
-        streamStatusText.className = 'text-base font-bold text-slate-900 font-mono';
+        if (btnToggleStream) btnToggleStream.textContent = '⏸️ Pause';
+        if (streamStatusDot) streamStatusDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 live-dot';
+        if (streamStatusText) {
+          streamStatusText.textContent = `STREAMING (${(streamSpeedMs/1000).toFixed(1)}s)`;
+          streamStatusText.className = 'text-base font-bold text-slate-900 font-mono';
+        }
         startStream();
       } else {
-        btnToggleStream.textContent = '▶️ Resume';
-        streamStatusDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
-        streamStatusText.textContent = 'PAUSED';
-        streamStatusText.className = 'text-base font-bold text-amber-700 font-mono';
+        if (btnToggleStream) btnToggleStream.textContent = '▶️ Resume';
+        if (streamStatusDot) streamStatusDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
+        if (streamStatusText) {
+          streamStatusText.textContent = 'PAUSED';
+          streamStatusText.className = 'text-base font-bold text-amber-700 font-mono';
+        }
         clearInterval(streamInterval);
       }
     }
@@ -1312,41 +1374,41 @@
       }, streamSpeedMs);
     }
 
-    for (let i = 0; i < 7; i++) {
-      generateSimulatedApplication();
+    function exportLiveStreamCSV() {
+      const rows = document.querySelectorAll('#stream-tbody tr');
+      if (!rows.length) {
+        alert('No live stream records available to export.');
+        return;
+      }
+
+      let csv = 'Timestamp,Application_ID,Annual_Income,Loan_Amount,CIBIL_Score,DTI_Ratio,Calibrated_Risk,Decision,Adverse_Action_Reason\n';
+      rows.forEach(tr => {
+        const cols = tr.querySelectorAll('td');
+        if (cols.length >= 9) {
+          const rowData = Array.from(cols).map(td => {
+            let text = td.textContent.trim().replace(/"/g, '""');
+            return `"${text}"`;
+          });
+          csv += rowData.join(',') + '\n';
+        }
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `FinShield_Live_Audit_Trail_${timestamp}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
-    startStream();
 
     // ==========================================================
-    // INTERACTIVE SIMULATOR (INR System - Tab 2)
+    // INTERACTIVE UNDERWRITER LOGIC
     // ==========================================================
-    const inIncome = document.getElementById('in-income');
-    const inLoan = document.getElementById('in-loan');
-    const inScore = document.getElementById('in-score');
-    const inUtil = document.getElementById('in-util');
-    const inDti = document.getElementById('in-dti');
-    const inDelinq = document.getElementById('in-delinq');
-    const inRate = document.getElementById('in-rate');
-    const inEmp = document.getElementById('in-emp');
-
-    const valScore = document.getElementById('val-score');
-    const valUtil = document.getElementById('val-util');
-    const valDti = document.getElementById('val-dti');
-    const lblIncomeWords = document.getElementById('lbl-income-in-words');
-    const lblLoanWords = document.getElementById('lbl-loan-in-words');
-
-    const decisionBanner = document.getElementById('decision-banner');
-    const decisionText = document.getElementById('decision-text');
-    const decisionSub = document.getElementById('decision-sub');
-    const gaugeBar = document.getElementById('gauge-bar');
-    const gaugeValue = document.getElementById('gauge-value');
-    const adverseCard = document.getElementById('adverse-card');
-    const adverseList = document.getElementById('adverse-list');
-    const sigStress = document.getElementById('sig-stress');
-    const sigBurden = document.getElementById('sig-burden');
-    const sigRatio = document.getElementById('sig-ratio');
-
     function loadPreset(type) {
+      if (!inIncome) return;
       if (type === 'prime') {
         inIncome.value = 1800000;
         inLoan.value = 400000;
@@ -1379,9 +1441,11 @@
     }
 
     function recalculateInteractive() {
-      valScore.textContent = inScore.value;
-      valUtil.textContent = inUtil.value + '%';
-      valDti.textContent = inDti.value + '%';
+      if (!inScore) return;
+
+      if (valScore) valScore.textContent = inScore.value;
+      if (valUtil) valUtil.textContent = inUtil.value + '%';
+      if (valDti) valDti.textContent = inDti.value + '%';
 
       const income = parseFloat(inIncome.value) || 600000;
       const loan = parseFloat(inLoan.value) || 200000;
@@ -1392,8 +1456,8 @@
       const rate = parseFloat(inRate.value) || 10.0;
       const emp = parseFloat(inEmp.value) || 4;
 
-      lblIncomeWords.textContent = formatINRWords(income);
-      lblLoanWords.textContent = formatINRWords(loan);
+      if (lblIncomeWords) lblIncomeWords.textContent = formatINRWords(income);
+      if (lblLoanWords) lblLoanWords.textContent = formatINRWords(loan);
 
       const income_to_loan = income / Math.max(loan, 1);
       const credit_deficit = Math.max(0, 850 - score) / 100.0;
@@ -1405,7 +1469,6 @@
       const installment = (loan * r) / (1.0 - Math.pow(1.0 + r, -36));
       const payment_burden = (installment / monthly_income) * 100.0;
 
-      // Calibrated Log-odds
       let z = -2.85;
       z += 4.5 * (dti - 0.28);
       z += 3.8 * (revolving_stress - 0.45);
@@ -1419,34 +1482,29 @@
       prob = Math.min(0.999, Math.max(0.005, prob));
       const probPct = (prob * 100).toFixed(1);
 
-      // Gauge SVG
       const circumference = 314.159;
       const offset = circumference - (prob * circumference);
-      gaugeBar.style.strokeDashoffset = offset;
-      gaugeValue.textContent = probPct + '%';
+      if (gaugeBar) gaugeBar.style.strokeDashoffset = offset;
+      if (gaugeValue) gaugeValue.textContent = probPct + '%';
 
-      // Signals
-      sigStress.textContent = revolving_stress.toFixed(2);
-      sigBurden.textContent = payment_burden.toFixed(1) + '%';
-      sigRatio.textContent = income_to_loan.toFixed(1) + 'x';
+      if (sigStress) sigStress.textContent = revolving_stress.toFixed(2);
+      if (sigBurden) sigBurden.textContent = payment_burden.toFixed(1) + '%';
+      if (sigRatio) sigRatio.textContent = income_to_loan.toFixed(1) + 'x';
 
       if (prob < 0.35) {
-        // APPROVED
-        decisionBanner.className = "w-full py-3 px-4 rounded-lg font-bold text-xs tracking-wider uppercase mb-5 flex items-center justify-center space-x-2 bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs";
-        decisionText.textContent = "UNDERWRITING: APPROVED (Prime Tier)";
-        gaugeBar.style.stroke = "#059669";
-        decisionSub.innerHTML = `Calibrated default risk of <strong class="text-emerald-800">${probPct}%</strong> is well within the institutional ceiling (35.0%).`;
-        adverseCard.classList.add('hidden');
-        if (btnLetterLabel) btnLetterLabel.textContent = "Generate Official RBI Sanction Letter (PDF)";
+        if (decisionBanner) decisionBanner.className = "w-full py-3 px-4 rounded-lg font-bold text-xs tracking-wider uppercase mb-5 flex items-center justify-center space-x-2 bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs";
+        if (decisionText) decisionText.textContent = "UNDERWRITING: APPROVED (Prime Tier)";
+        if (gaugeBar) gaugeBar.style.stroke = "#059669";
+        if (decisionSub) decisionSub.innerHTML = `Calibrated default risk of <strong class="text-emerald-800">${probPct}%</strong> is well within the institutional ceiling (35.0%).`;
+        if (adverseCard) adverseCard.classList.add('hidden');
+        if (btnDirectDownloadLabel) btnDirectDownloadLabel.textContent = "Download Sanction Letter (.PDF)";
       } else {
-        // DECLINED
-        decisionBanner.className = "w-full py-3 px-4 rounded-lg font-bold text-xs tracking-wider uppercase mb-5 flex items-center justify-center space-x-2 bg-rose-50 text-rose-800 border border-rose-200 shadow-2xs";
-        decisionText.textContent = "UNDERWRITING: DECLINED (Subprime Tier)";
-        gaugeBar.style.stroke = "#e11d48";
-        decisionSub.innerHTML = `Calibrated default risk of <strong class="text-rose-700">${probPct}%</strong> exceeds the risk tolerance ceiling of 35.0%.`;
-        if (btnLetterLabel) btnLetterLabel.textContent = "Generate Mandated Adverse Action Notice (PDF)";
+        if (decisionBanner) decisionBanner.className = "w-full py-3 px-4 rounded-lg font-bold text-xs tracking-wider uppercase mb-5 flex items-center justify-center space-x-2 bg-rose-50 text-rose-800 border border-rose-200 shadow-2xs";
+        if (decisionText) decisionText.textContent = "UNDERWRITING: DECLINED (Subprime Tier)";
+        if (gaugeBar) gaugeBar.style.stroke = "#e11d48";
+        if (decisionSub) decisionSub.innerHTML = `Calibrated default risk of <strong class="text-rose-700">${probPct}%</strong> exceeds the risk tolerance ceiling of 35.0%.`;
+        if (btnDirectDownloadLabel) btnDirectDownloadLabel.textContent = "Download Declination Notice (.PDF)";
 
-        // Reasons in INR context
         const reasons = [];
         if (delinq > 0) reasons.push(`Prior 30+ day payment delinquencies reported on credit bureau (${delinq} missed EMIs)`);
         if (score < 660) reasons.push(`CIBIL / FICO bureau score (${score}) below prime risk cutoff (660)`);
@@ -1454,181 +1512,155 @@
         if (dti > 0.38) reasons.push(`Total monthly EMI obligations exceed prudent limit (${(dti * 100).toFixed(0)}% DTI)`);
         if (income_to_loan < 2.5) reasons.push(`Requested loan (${formatINR(loan)}) is disproportionate to annual income (${formatINR(income)})`);
 
-        adverseList.innerHTML = '';
-        reasons.slice(0, 3).forEach((r, idx) => {
-          const item = document.createElement('div');
-          item.className = "p-2.5 rounded-lg bg-white border border-rose-200 text-slate-700 flex items-start space-x-2 shadow-2xs";
-          item.innerHTML = `<span class="font-bold text-rose-700">#${idx+1}</span><span>${r}</span>`;
-          adverseList.appendChild(item);
-        });
+        if (adverseList) {
+          adverseList.innerHTML = '';
+          reasons.slice(0, 3).forEach((r, idx) => {
+            const item = document.createElement('div');
+            item.className = "p-2.5 rounded-lg bg-white border border-rose-200 text-slate-700 flex items-start space-x-2 shadow-2xs";
+            item.innerHTML = `<span class="font-bold text-rose-700">#${idx+1}</span><span>${r}</span>`;
+            adverseList.appendChild(item);
+          });
+        }
 
-        adverseCard.classList.remove('hidden');
+        if (adverseCard) adverseCard.classList.remove('hidden');
       }
       lucide.createIcons();
-    }
-
-    [inIncome, inLoan, inScore, inUtil, inDti, inDelinq, inRate, inEmp].forEach(el => {
-      el.addEventListener('input', recalculateInteractive);
-    });
-
-    recalculateInteractive();
-  
-    // ==========================================================
-    // EXPORT LIVE STREAM AUDIT TRAIL (.CSV)
-    // ==========================================================
-    function exportLiveStreamCSV() {
-      const rows = document.querySelectorAll('#stream-tbody tr');
-      if (!rows.length) {
-        alert('No live stream records available to export.');
-        return;
-      }
-
-      let csv = 'Timestamp,Application_ID,Annual_Income,Loan_Amount,CIBIL_Score,DTI_Ratio,Calibrated_Risk,Decision,Adverse_Action_Reason\n';
-      rows.forEach(tr => {
-        const cols = tr.querySelectorAll('td');
-        if (cols.length >= 9) {
-          const rowData = Array.from(cols).map(td => {
-            let text = td.textContent.trim().replace(/"/g, '""');
-            return `"${text}"`;
-          });
-          csv += rowData.join(',') + '\n';
-        }
-      });
-
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-      link.setAttribute('href', url);
-      link.setAttribute('download', `FinShield_Live_Audit_Trail_${timestamp}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
     }
 
     // ==========================================================
     // OFFICIAL SANCTION / ADVERSE ACTION LETTER ENGINE
     // ==========================================================
-    const docModal = document.getElementById('doc-modal');
-    const docRefId = document.getElementById('doc-ref-id');
-    const docDate = document.getElementById('doc-date');
-    const docBadgeStatus = document.getElementById('doc-badge-status');
-    const docTitle = document.getElementById('doc-title');
-    const docSubtitle = document.getElementById('doc-subtitle');
-    const docIncome = document.getElementById('doc-income');
-    const docLoan = document.getElementById('doc-loan');
-    const docScore = document.getElementById('doc-score');
-    const docDti = document.getElementById('doc-dti');
-    const docUtil = document.getElementById('doc-util');
-    const docDelinq = document.getElementById('doc-delinq');
-    const docBodySection = document.getElementById('doc-body-section');
-    const docHash = document.getElementById('doc-hash');
-    const btnDirectDownloadLabel = document.getElementById('btn-direct-download-label');
-
     function populateDocumentData() {
-      const income = parseFloat(inIncome.value) || 600000;
-      const loan = parseFloat(inLoan.value) || 200000;
-      const score = parseFloat(inScore.value) || 680;
-      const util = parseFloat(inUtil.value) || 12;
-      const dti = parseFloat(inDti.value) || 18;
-      const delinq = parseInt(inDelinq.value) || 0;
-      const rate = parseFloat(inRate.value) || 10.5;
+      const income = parseFloat(inIncome ? inIncome.value : '600000') || 600000;
+      const loan = parseFloat(inLoan ? inLoan.value : '200000') || 200000;
+      const score = parseFloat(inScore ? inScore.value : '680') || 680;
+      const util = parseFloat(inUtil ? inUtil.value : '12') || 12;
+      const dti = parseFloat(inDti ? inDti.value : '18') || 18;
+      const delinq = parseInt(inDelinq ? inDelinq.value : '0') || 0;
+      const rate = parseFloat(inRate ? inRate.value : '10.5') || 10.5;
 
       const randomHash = '0x' + Array.from({length: 16}, () => Math.floor(Math.random()*16).toString(16)).join('');
       const randomRef = 'REF-RBI-' + Math.floor(100000 + Math.random() * 900000);
       const todayStr = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 
-      docRefId.textContent = randomRef;
-      docDate.textContent = `Date: ${todayStr}`;
-      docIncome.textContent = formatINR(income);
-      docLoan.textContent = formatINR(loan);
-      docScore.textContent = score;
-      docDti.textContent = `${dti}%`;
-      docUtil.textContent = `${util}%`;
-      docDelinq.textContent = `${delinq} Incident(s)`;
-      docHash.textContent = randomHash;
+      if (docRefId) docRefId.textContent = randomRef;
+      if (docDate) docDate.textContent = `Date: ${todayStr}`;
+      if (docIncome) docIncome.textContent = formatINR(income);
+      if (docLoan) docLoan.textContent = formatINR(loan);
+      if (docScore) docScore.textContent = score;
+      if (docDti) docDti.textContent = `${dti}%`;
+      if (docUtil) docUtil.textContent = `${util}%`;
+      if (docDelinq) docDelinq.textContent = `${delinq} Incident(s)`;
+      if (docHash) docHash.textContent = randomHash;
 
-      const isApproved = decisionText.textContent.includes('APPROVED');
+      const isApproved = decisionText ? decisionText.textContent.includes('APPROVED') : true;
 
       if (isApproved) {
-        docBadgeStatus.className = "inline-block px-2.5 py-1 rounded text-xs font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200";
-        docBadgeStatus.textContent = "SANCTIONED & APPROVED";
-        docTitle.textContent = "CREDIT SANCTION & TERMS OF APPROVAL MEMORANDUM";
-        docSubtitle.textContent = "Issued pursuant to RBI Master Directions on Digital Lending & Fair Practices Code";
+        if (docBadgeStatus) {
+          docBadgeStatus.className = "inline-block px-2.5 py-1 rounded text-xs font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200";
+          docBadgeStatus.textContent = "SANCTIONED & APPROVED";
+        }
+        if (docTitle) docTitle.textContent = "CREDIT SANCTION & TERMS OF APPROVAL MEMORANDUM";
+        if (docSubtitle) docSubtitle.textContent = "Issued pursuant to RBI Master Directions on Digital Lending & Fair Practices Code";
 
         const monthlyRate = (rate / 100) / 12;
         const emi = Math.round((loan * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -36)));
 
-        docBodySection.innerHTML = `
-          <div class="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200 space-y-2">
-            <h5 class="font-bold text-emerald-950 uppercase text-[11px] tracking-wider">Sanction Terms & Commercial Facility</h5>
-            <div class="grid grid-cols-3 gap-3 text-xs pt-1">
-              <div>
-                <span class="text-slate-500 block text-[10px]">Sanctioned Facility:</span>
-                <span class="font-mono font-bold text-slate-900">${formatINR(loan)}</span>
-              </div>
-              <div>
-                <span class="text-slate-500 block text-[10px]">Approved APR:</span>
-                <span class="font-mono font-bold text-slate-900">${rate.toFixed(2)}% p.a.</span>
-              </div>
-              <div>
-                <span class="text-slate-500 block text-[10px]">Estimated Monthly EMI:</span>
-                <span class="font-mono font-bold text-emerald-800">${formatINR(emi)} / mo</span>
+        if (docBodySection) {
+          docBodySection.innerHTML = `
+            <div class="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200 space-y-2">
+              <h5 class="font-bold text-emerald-950 uppercase text-[11px] tracking-wider">Sanction Terms & Commercial Facility</h5>
+              <div class="grid grid-cols-3 gap-3 text-xs pt-1">
+                <div>
+                  <span class="text-slate-500 block text-[10px]">Sanctioned Facility:</span>
+                  <span class="font-mono font-bold text-slate-900">${formatINR(loan)}</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block text-[10px]">Approved APR:</span>
+                  <span class="font-mono font-bold text-slate-900">${rate.toFixed(2)}% p.a.</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block text-[10px]">Estimated Monthly EMI:</span>
+                  <span class="font-mono font-bold text-emerald-800">${formatINR(emi)} / mo</span>
+                </div>
               </div>
             </div>
-          </div>
-          <p class="text-slate-600 leading-relaxed text-xs">
-            We are pleased to inform you that following autonomous quantitative risk assessment by FinShield, your credit facility application has been sanctioned under the Prime Lending Framework. The applicant maintains an exceptional CIBIL profile (${score}) with a conservative debt-to-income metric (${dti}%).
-          </p>
-          <div class="text-[11px] text-slate-500 border-l-2 border-emerald-500 pl-3 italic">
-            This sanction is subject to standard KYC verification in accordance with RBI Master Direction - Know Your Customer (KYC) Direction, 2016.
-          </div>
-        `;
+            <p class="text-slate-600 leading-relaxed text-xs">
+              We are pleased to inform you that following autonomous quantitative risk assessment by FinShield, your credit facility application has been sanctioned under the Prime Lending Framework. The applicant maintains an exceptional CIBIL profile (${score}) with a conservative debt-to-income metric (${dti}%).
+            </p>
+            <div class="text-[11px] text-slate-500 border-l-2 border-emerald-500 pl-3 italic">
+              This sanction is subject to standard KYC verification in accordance with RBI Master Direction - Know Your Customer (KYC) Direction, 2016.
+            </div>
+          `;
+        }
       } else {
-        docBadgeStatus.className = "inline-block px-2.5 py-1 rounded text-xs font-bold uppercase bg-rose-100 text-rose-800 border border-rose-200";
-        docBadgeStatus.textContent = "DECLINED (SUBPRIME)";
-        docTitle.textContent = "MANDATED ADVERSE ACTION STATEMENT & STATUTORY DISCLOSURE";
-        docSubtitle.textContent = "Issued in strict compliance with Section 28(a) of the RBI Fair Practices Code";
+        if (docBadgeStatus) {
+          docBadgeStatus.className = "inline-block px-2.5 py-1 rounded text-xs font-bold uppercase bg-rose-100 text-rose-800 border border-rose-200";
+          docBadgeStatus.textContent = "DECLINED (SUBPRIME)";
+        }
+        if (docTitle) docTitle.textContent = "MANDATED ADVERSE ACTION STATEMENT & STATUTORY DISCLOSURE";
+        if (docSubtitle) docSubtitle.textContent = "Issued in strict compliance with Section 28(a) of the RBI Fair Practices Code";
 
         let adverseHtml = '';
-        const items = adverseList.querySelectorAll('div');
-        items.forEach((item, idx) => {
-          adverseHtml += `<li class="text-slate-700 font-medium">${item.innerText}</li>`;
-        });
+        if (adverseList) {
+          const items = adverseList.querySelectorAll('div');
+          items.forEach((item, idx) => {
+            adverseHtml += `<li class="text-slate-700 font-medium">${item.textContent}</li>`;
+          });
+        }
 
-        docBodySection.innerHTML = `
-          <div class="p-4 rounded-xl bg-rose-50/60 border border-rose-200 space-y-2">
-            <h5 class="font-bold text-rose-950 uppercase text-[11px] tracking-wider">Key Principal Reasons for Declination</h5>
-            <ol class="list-decimal pl-4 space-y-1.5 text-xs pt-1">
-              ${adverseHtml || '<li class="text-slate-700">Financial burden and debt obligations exceed prudent underwriting ceilings.</li>'}
-            </ol>
-          </div>
-          <p class="text-slate-600 leading-relaxed text-xs">
-            In accordance with regulatory mandates, you are notified that our autonomous credit model was unable to approve your application at this time based upon the risk parameters cited above.
-          </p>
-          <div class="text-[11px] text-slate-500 border-l-2 border-rose-500 pl-3 italic">
-            Credit Information Bureau Disclosure: Your credit history was obtained from TransUnion CIBIL / Experian India. Under the Credit Information Companies (Regulation) Act, 2005, you have the right to request a free disclosure copy from the respective bureau.
-          </div>
-        `;
+        if (docBodySection) {
+          docBodySection.innerHTML = `
+            <div class="p-4 rounded-xl bg-rose-50/60 border border-rose-200 space-y-2">
+              <h5 class="font-bold text-rose-950 uppercase text-[11px] tracking-wider">Key Principal Reasons for Declination</h5>
+              <ol class="list-decimal pl-4 space-y-1.5 text-xs pt-1">
+                ${adverseHtml || '<li class="text-slate-700">Financial burden and debt obligations exceed prudent underwriting ceilings.</li>'}
+              </ol>
+            </div>
+            <p class="text-slate-600 leading-relaxed text-xs">
+              In accordance with regulatory mandates, you are notified that our autonomous credit model was unable to approve your application at this time based upon the risk parameters cited above.
+            </p>
+            <div class="text-[11px] text-slate-500 border-l-2 border-rose-500 pl-3 italic">
+              Credit Information Bureau Disclosure: Your credit history was obtained from TransUnion CIBIL / Experian India. Under the Credit Information Companies (Regulation) Act, 2005, you have the right to request a free disclosure copy from the respective bureau.
+            </div>
+          `;
+        }
       }
     }
 
     function openDocumentModal() {
       populateDocumentData();
-      docModal.classList.remove('hidden');
+      if (docModal) {
+        docModal.style.visibility = '';
+        docModal.classList.remove('hidden');
+      }
       lucide.createIcons();
     }
 
     function closeDocumentModal() {
-      docModal.classList.add('hidden');
+      if (docModal) {
+        docModal.classList.add('hidden');
+        docModal.style.visibility = '';
+      }
     }
 
     // DIRECT PDF DOWNLOAD FUNCTION
     function downloadLetterPDF() {
       populateDocumentData();
-      const isApproved = decisionText.textContent.includes('APPROVED');
+      const isApproved = decisionText ? decisionText.textContent.includes('APPROVED') : true;
       const filename = isApproved ? 'FinShield_Credit_Sanction_Letter.pdf' : 'FinShield_Adverse_Action_Notice.pdf';
       const element = document.getElementById('printable-doc');
+
+      if (!element) {
+        alert('Document element not found.');
+        return;
+      }
+
+      const wasHidden = docModal && docModal.classList.contains('hidden');
+      if (wasHidden) {
+        docModal.style.visibility = 'hidden';
+        docModal.classList.remove('hidden');
+      }
 
       if (window.html2pdf) {
         const opt = {
@@ -1638,9 +1670,24 @@
           html2canvas:  { scale: 2, useCORS: true },
           jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
-        html2pdf().set(opt).from(element).save();
+        html2pdf().set(opt).from(element).save().then(() => {
+          if (wasHidden) {
+            docModal.classList.add('hidden');
+            docModal.style.visibility = '';
+          }
+        }).catch((err) => {
+          console.error('html2pdf generation error, falling back to Word download:', err);
+          if (wasHidden) {
+            docModal.classList.add('hidden');
+            docModal.style.visibility = '';
+          }
+          downloadLetterDOC();
+        });
       } else {
-        // Fallback: download formatted Word doc
+        if (wasHidden) {
+          docModal.classList.add('hidden');
+          docModal.style.visibility = '';
+        }
         downloadLetterDOC();
       }
     }
@@ -1648,9 +1695,10 @@
     // DIRECT WORD (.DOC) DOWNLOAD FUNCTION
     function downloadLetterDOC() {
       populateDocumentData();
-      const isApproved = decisionText.textContent.includes('APPROVED');
+      const isApproved = decisionText ? decisionText.textContent.includes('APPROVED') : true;
       const filename = isApproved ? 'FinShield_Credit_Sanction_Letter.doc' : 'FinShield_Adverse_Action_Notice.doc';
-      const content = document.getElementById('printable-doc').innerHTML;
+      const element = document.getElementById('printable-doc');
+      const content = element ? element.innerHTML : '';
 
       const header = `
         <html xmlns:o='urn:schemas-microsoft-com:office:office' 
@@ -1678,32 +1726,26 @@
     }
 
     // ==========================================================
-    // WHAT-IF SENSITIVITY & CREDIT HEALTH OPTIMIZER
+    // WHAT-IF SENSITIVITY SIMULATOR
     // ==========================================================
-    const whatifSliderUtil = document.getElementById('whatif-slider-util');
-    const whatifSliderIncome = document.getElementById('whatif-slider-income');
-    const whatifValUtil = document.getElementById('whatif-val-util');
-    const whatifValIncome = document.getElementById('whatif-val-income');
-    const whatifRiskDisplay = document.getElementById('whatif-risk-display');
-    const whatifDeltaDisplay = document.getElementById('whatif-delta-display');
-    const whatifStatusBadge = document.getElementById('whatif-status-badge');
-
     function updateWhatIfSimulator() {
+      if (!whatifSliderUtil || !whatifSliderIncome) return;
+
       const deltaUtil = parseFloat(whatifSliderUtil.value) || 0;
       const deltaIncome = parseFloat(whatifSliderIncome.value) || 0;
 
-      whatifValUtil.textContent = deltaUtil > 0 ? `-${deltaUtil}%` : `-0%`;
-      whatifValIncome.textContent = deltaIncome > 0 ? `+${formatINR(deltaIncome)}` : `+₹0`;
+      if (whatifValUtil) whatifValUtil.textContent = deltaUtil > 0 ? `-${deltaUtil}%` : `-0%`;
+      if (whatifValIncome) whatifValIncome.textContent = deltaIncome > 0 ? `+${formatINR(deltaIncome)}` : `+₹0`;
 
-      const income = (parseFloat(inIncome.value) || 600000) + deltaIncome;
-      const loan = parseFloat(inLoan.value) || 200000;
-      const score = parseFloat(inScore.value) || 680;
-      const baseUtil = parseFloat(inUtil.value) || 30;
+      const income = (parseFloat(inIncome ? inIncome.value : '600000') || 600000) + deltaIncome;
+      const loan = parseFloat(inLoan ? inLoan.value : '200000') || 200000;
+      const score = parseFloat(inScore ? inScore.value : '680') || 680;
+      const baseUtil = parseFloat(inUtil ? inUtil.value : '30') || 30;
       const util = Math.max(0.01, (baseUtil - deltaUtil) / 100.0);
-      const dti = parseFloat(inDti.value) / 100.0;
-      const delinq = parseInt(inDelinq.value) || 0;
-      const rate = parseFloat(inRate.value) || 10.0;
-      const emp = parseFloat(inEmp.value) || 4;
+      const dti = parseFloat(inDti ? inDti.value : '28') / 100.0;
+      const delinq = parseInt(inDelinq ? inDelinq.value : '0') || 0;
+      const rate = parseFloat(inRate ? inRate.value : '10.0') || 10.0;
+      const emp = parseFloat(inEmp ? inEmp.value : '4') || 4;
 
       const income_to_loan = income / Math.max(loan, 1);
       const credit_deficit = Math.max(0, 850 - score) / 100.0;
@@ -1723,40 +1765,51 @@
       prob = Math.min(0.999, Math.max(0.005, prob));
       const probPct = (prob * 100).toFixed(1);
 
-      whatifRiskDisplay.textContent = `${probPct}%`;
+      if (whatifRiskDisplay) whatifRiskDisplay.textContent = `${probPct}%`;
 
-      const baselineProb = parseFloat(gaugeValue.textContent) || 2.4;
+      const baselineProb = parseFloat(gaugeValue ? gaugeValue.textContent : '2.4') || 2.4;
       const delta = (prob * 100) - baselineProb;
-      if (Math.abs(delta) < 0.1) {
-        whatifDeltaDisplay.textContent = '(Baseline)';
-        whatifDeltaDisplay.className = 'font-mono text-[11px] text-slate-500 font-semibold';
-      } else if (delta < 0) {
-        whatifDeltaDisplay.textContent = `(${delta.toFixed(1)}% Risk Reduced)`;
-        whatifDeltaDisplay.className = 'font-mono text-[11px] text-emerald-600 font-semibold';
-      } else {
-        whatifDeltaDisplay.textContent = `(+${delta.toFixed(1)}% Risk Increased)`;
-        whatifDeltaDisplay.className = 'font-mono text-[11px] text-rose-600 font-semibold';
+      if (whatifDeltaDisplay) {
+        if (Math.abs(delta) < 0.1) {
+          whatifDeltaDisplay.textContent = '(Baseline)';
+          whatifDeltaDisplay.className = 'font-mono text-[11px] text-slate-500 font-semibold';
+        } else if (delta < 0) {
+          whatifDeltaDisplay.textContent = `(${delta.toFixed(1)}% Risk Reduced)`;
+          whatifDeltaDisplay.className = 'font-mono text-[11px] text-emerald-600 font-semibold';
+        } else {
+          whatifDeltaDisplay.textContent = `(+${delta.toFixed(1)}% Risk Increased)`;
+          whatifDeltaDisplay.className = 'font-mono text-[11px] text-rose-600 font-semibold';
+        }
       }
 
-      if (prob < 0.35) {
-        whatifStatusBadge.className = "px-2.5 py-1 rounded font-bold text-[11px] bg-emerald-100 text-emerald-800 border border-emerald-200";
-        whatifStatusBadge.textContent = "APPROVED";
-      } else {
-        whatifStatusBadge.className = "px-2.5 py-1 rounded font-bold text-[11px] bg-rose-100 text-rose-800 border border-rose-200";
-        whatifStatusBadge.textContent = "DECLINED";
+      if (whatifStatusBadge) {
+        if (prob < 0.35) {
+          whatifStatusBadge.className = "px-2.5 py-1 rounded font-bold text-[11px] bg-emerald-100 text-emerald-800 border border-emerald-200";
+          whatifStatusBadge.textContent = "APPROVED";
+        } else {
+          whatifStatusBadge.className = "px-2.5 py-1 rounded font-bold text-[11px] bg-rose-100 text-rose-800 border border-rose-200";
+          whatifStatusBadge.textContent = "DECLINED";
+        }
       }
     }
 
-    if (whatifSliderUtil && whatifSliderIncome) {
-      whatifSliderUtil.addEventListener('input', updateWhatIfSimulator);
-      whatifSliderIncome.addEventListener('input', updateWhatIfSimulator);
-    }
+    // ==========================================================
+    // INITIALIZATION & EVENT LISTENERS
+    // ==========================================================
+    [inIncome, inLoan, inScore, inUtil, inDti, inDelinq, inRate, inEmp].forEach(el => {
+      if (el) el.addEventListener('input', recalculateInteractive);
+    });
 
+    if (whatifSliderUtil) whatifSliderUtil.addEventListener('input', updateWhatIfSimulator);
+    if (whatifSliderIncome) whatifSliderIncome.addEventListener('input', updateWhatIfSimulator);
+
+    // Initial calculations
+    recalculateInteractive();
+
+    for (let i = 0; i < 7; i++) {
+      generateSimulatedApplication();
+    }
+    startStream();
   </script>
-  
-
-    </div>
-  </div>
-
 </body>
 </html>
