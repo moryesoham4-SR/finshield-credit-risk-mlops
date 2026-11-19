@@ -1,8 +1,11 @@
 // FinShield Vercel Serverless Function: /api/score
-// Real-time credit risk scoring, probability calibration, and ECOA Adverse Action generation
+// Real-time credit risk scoring, probability calibration, and ECOA/RBI Adverse Action generation (INR Currency)
+
+function formatINR(val) {
+  return '₹' + Number(val).toLocaleString('en-IN');
+}
 
 module.exports = function handler(req, res) {
-  // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
@@ -12,11 +15,11 @@ module.exports = function handler(req, res) {
     return res.status(200).end();
   }
 
-  // Handle health check
   if (req.method === 'GET') {
     return res.status(200).json({
       status: 'ONLINE',
       service: 'FinShield Credit Underwriting & Adverse Action API',
+      currency: 'INR (₹)',
       version: '1.0.0',
       cloud: 'Microsoft Azure Architecture'
     });
@@ -35,6 +38,7 @@ module.exports = function handler(req, res) {
 
     return res.status(200).json({
       status: 'SUCCESS',
+      currency: 'INR (₹)',
       results: results
     });
   } catch (error) {
@@ -47,10 +51,10 @@ module.exports = function handler(req, res) {
 
 function evaluateApplication(rec) {
   const applicant_id = rec.applicant_id || 'APP-DEMO';
-  const age = parseFloat(rec.age) || 35;
-  const annual_income = Math.max(1000, parseFloat(rec.annual_income) || 60000);
+  const age = parseFloat(rec.age) || 32;
+  const annual_income = Math.max(10000, parseFloat(rec.annual_income) || 600000);
   const employment_years = Math.max(0, parseFloat(rec.employment_years) || 4);
-  const loan_amount = Math.max(500, parseFloat(rec.loan_amount) || 15000);
+  const loan_amount = Math.max(5000, parseFloat(rec.loan_amount) || 200000);
   const interest_rate = Math.max(1.0, parseFloat(rec.interest_rate) || 10.0);
   const credit_score = Math.min(850, Math.max(300, parseFloat(rec.credit_score) || 680));
   const revolving_utilization = Math.max(0.0, parseFloat(rec.revolving_utilization) || 0.35);
@@ -68,7 +72,7 @@ function evaluateApplication(rec) {
   const installment = (loan_amount * r) / (1.0 - Math.pow(1.0 + r, -36));
   const payment_burden = installment / monthly_income;
 
-  // 2. Calibrated Latent Risk Calculation (Matching Calibrated GBDT Model)
+  // 2. Calibrated Latent Risk Calculation
   let log_odds = -2.85;
   log_odds += 4.5 * (debt_to_income - 0.28);
   log_odds += 3.8 * (revolving_stress - 0.45);
@@ -80,13 +84,12 @@ function evaluateApplication(rec) {
     log_odds += 0.45 * (2.5 - income_to_loan);
   }
 
-  // Sigmoid probability calibration
   const risk_probability = 1.0 / (1.0 + Math.exp(-log_odds));
   const rounded_risk = Math.min(0.999, Math.max(0.005, Math.round(risk_probability * 10000) / 10000));
   const threshold = 0.35;
   const decision = rounded_risk < threshold ? 'APPROVED' : 'DECLINED';
 
-  // 3. Regulatory Adverse Action Notice Generation (ECOA / CFPB)
+  // 3. Regulatory Adverse Action Notice Generation (RBI Fair Lending / ECOA)
   const adverse_action_reasons = [];
   if (decision === 'DECLINED') {
     const candidates = [];
@@ -95,7 +98,7 @@ function evaluateApplication(rec) {
       candidates.push({
         score: delinquencies_2yrs * 2.0,
         factor: 'delinquencies_2yrs',
-        regulatory_notice: `Recent delinquencies or late payments on credit bureau file (${delinquencies_2yrs} reported incidents)`
+        regulatory_notice: `Prior 30+ day delinquencies reported on credit bureau (${delinquencies_2yrs} missed EMIs)`
       });
     }
 
@@ -103,7 +106,7 @@ function evaluateApplication(rec) {
       candidates.push({
         score: (660 - credit_score) * 0.03,
         factor: 'credit_score',
-        regulatory_notice: `Credit bureau score (${credit_score}) below prime risk threshold (660)`
+        regulatory_notice: `CIBIL / FICO credit score (${credit_score}) below prime risk threshold (660)`
       });
     }
 
@@ -111,7 +114,7 @@ function evaluateApplication(rec) {
       candidates.push({
         score: (revolving_utilization - 0.45) * 4.0,
         factor: 'revolving_utilization',
-        regulatory_notice: `Proportion of revolving credit card balances to credit limits is too high (${(revolving_utilization * 100).toFixed(1)}%)`
+        regulatory_notice: `Credit card balance utilization is excessively high (${(revolving_utilization * 100).toFixed(1)}%)`
       });
     }
 
@@ -119,15 +122,15 @@ function evaluateApplication(rec) {
       candidates.push({
         score: (debt_to_income - 0.38) * 6.0,
         factor: 'debt_to_income',
-        regulatory_notice: `Total debt-to-income ratio (${(debt_to_income * 100).toFixed(1)}%) exceeds maximum acceptable underwriting ceiling`
+        regulatory_notice: `Total monthly EMI debt burden (${(debt_to_income * 100).toFixed(1)}% DTI) exceeds acceptable ceiling`
       });
     }
 
-    if (income_to_loan < 3.0) {
+    if (income_to_loan < 2.5) {
       candidates.push({
-        score: (3.0 - income_to_loan) * 1.5,
+        score: (2.5 - income_to_loan) * 1.5,
         factor: 'income_to_loan_ratio',
-        regulatory_notice: `Requested loan amount ($${loan_amount.toLocaleString()}) is excessive relative to verified annual income ($${annual_income.toLocaleString()})`
+        regulatory_notice: `Requested loan amount (${formatINR(loan_amount)}) is disproportionate to annual income (${formatINR(annual_income)})`
       });
     }
 
@@ -141,7 +144,7 @@ function evaluateApplication(rec) {
     if (adverse_action_reasons.length === 0) {
       adverse_action_reasons.push({
         factor: 'debt_to_income',
-        regulatory_notice: `Elevated overall risk score based on multi-factor debt obligations and credit profile`
+        regulatory_notice: `Elevated overall default probability based on debt obligation and credit profile`
       });
     }
   }
@@ -151,6 +154,7 @@ function evaluateApplication(rec) {
     risk_probability: rounded_risk,
     underwriting_decision: decision,
     decision_threshold: threshold,
+    currency: 'INR (₹)',
     engineered_signals: {
       revolving_stress: parseFloat(revolving_stress.toFixed(2)),
       delinquency_severity: parseFloat(delinquency_severity.toFixed(2)),
