@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FinShield | Institutional Credit Underwriting & Real-Time Risk Terminal</title>
+  <title>FinShield | Institutional Credit Underwriting & Capital Protection Terminal</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
@@ -42,658 +42,703 @@
     }
     @keyframes pulse-subtle {
       0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
+      50% { opacity: 0.35; }
     }
     .live-dot {
       animation: pulse-subtle 1.8s infinite;
     }
+
+    /* Reserve Bank of India Architectural Watermark Overlay */
+    .rbi-bg-watermark {
+      background-color: #F8FAFC;
+      background-image: 
+        radial-gradient(at 100% 0%, rgba(30, 58, 138, 0.04) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, rgba(5, 150, 105, 0.03) 0px, transparent 50%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600' opacity='0.035'%3E%3Cpath d='M400,30 L760,140 L40,140 Z' fill='%230f172a'/%3E%3Crect x='60' y='140' width='680' height='25' fill='%230f172a'/%3E%3Ccircle cx='400' cy='85' r='35' fill='none' stroke='%230f172a' stroke-width='6'/%3E%3Cpath d='M400,60 L400,110 M375,85 L425,85' stroke='%230f172a' stroke-width='5'/%3E%3C!-- Columns --%3E%3Crect x='90' y='175' width='45' height='360' fill='%230f172a'/%3E%3Crect x='180' y='175' width='45' height='360' fill='%230f172a'/%3E%3Crect x='270' y='175' width='45' height='360' fill='%230f172a'/%3E%3Crect x='360' y='175' width='45' height='360' fill='%230f172a'/%3E%3Crect x='450' y='175' width='45' height='360' fill='%230f172a'/%3E%3Crect x='540' y='175' width='45' height='360' fill='%230f172a'/%3E%3Crect x='630' y='175' width='45' height='360' fill='%230f172a'/%3E%3C!-- Base Plinth --%3E%3Crect x='50' y='535' width='700' height='35' fill='%230f172a'/%3E%3Crect x='30' y='570' width='740' height='25' fill='%230f172a'/%3E%3C/svg%3E");
+      background-position: center right;
+      background-repeat: no-repeat;
+      background-size: 850px;
+    }
   </style>
 </head>
-<body class="bg-[#F8FAFC] text-slate-800 font-sans min-h-screen antialiased flex flex-col selection:bg-blue-100 selection:text-blue-900">
+<body class="bg-[#F8FAFC] text-slate-800 font-sans min-h-screen antialiased flex flex-col md:flex-row selection:bg-blue-100 selection:text-blue-900">
 
-  <!-- Institutional Bank Top Header -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-xs">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
-      
-      <!-- Bank Identity (Clickable to Home) -->
-      <button onclick="switchTab('tab-home')" class="flex items-center space-x-3.5 text-left focus:outline-none">
-        <div class="w-10 h-10 rounded-lg bg-blue-900 flex items-center justify-center shadow-md shadow-blue-900/10">
-          <i data-lucide="shield-check" class="w-6 h-6 text-white"></i>
-        </div>
-        <div>
-          <div class="flex items-center space-x-2">
-            <span class="text-xl font-extrabold tracking-tight text-slate-900">FinShield</span>
-            <span class="text-[11px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
-              Institutional Risk
-            </span>
+  <!-- ========================================================== -->
+  <!-- LEFT SIDEBAR NAVIGATION TERMINAL -->
+  <!-- ========================================================== -->
+  <aside class="w-full md:w-72 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 shadow-xs md:sticky md:top-0 md:h-screen z-40">
+    
+    <div>
+      <!-- Institutional Brand Header -->
+      <div class="p-5 border-b border-slate-200">
+        <button onclick="switchTab('tab-home')" class="flex items-center space-x-3 text-left w-full focus:outline-none group">
+          <div class="w-10 h-10 rounded-xl bg-blue-900 flex items-center justify-center shadow-md shadow-blue-900/15 group-hover:scale-105 transition">
+            <i data-lucide="shield-check" class="w-6 h-6 text-white"></i>
           </div>
-          <p class="text-[11px] text-slate-500 font-medium">Enterprise Credit Underwriting Terminal &bull; INR (₹)</p>
-        </div>
-      </button>
-
-      <!-- Live Stream Status Indicators -->
-      <div class="flex items-center space-x-5">
-        <div class="hidden md:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800">
-          <span class="w-2 h-2 rounded-full bg-emerald-600 live-dot mr-1"></span>
-          <span>Azure Event Hubs: Connected</span>
-          <span class="text-slate-400 font-normal">|</span>
-          <span class="font-mono text-emerald-700">38ms Latency</span>
-        </div>
-        
-        <a href="https://github.com/moryesoham4-SR/finshield-credit-risk-mlops" target="_blank" class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-medium text-xs shadow-2xs transition">
-          <i data-lucide="git-branch" class="w-3.5 h-3.5 text-slate-500"></i>
-          <span>GitHub Code</span>
-        </a>
+          <div>
+            <div class="flex items-center space-x-1.5">
+              <span class="text-lg font-extrabold tracking-tight text-slate-900">FinShield</span>
+              <span class="text-[10px] font-bold tracking-wider uppercase px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200">
+                RBI &bull; ML
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-500 font-medium">Underwriting & Capital Protection</p>
+          </div>
+        </button>
       </div>
 
-    </div>
-  </header>
-
-  <!-- Navigation Bar Tabs -->
-  <div class="bg-white border-b border-slate-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <nav class="flex space-x-8 -mb-px">
-        <button onclick="switchTab('tab-home')" id="btn-tab-home" class="tab-btn border-blue-700 text-blue-800 font-semibold whitespace-nowrap py-3.5 px-1 border-b-2 text-sm flex items-center space-x-2">
-          <i data-lucide="home" class="w-4 h-4"></i>
-          <span>Portal Home</span>
+      <!-- Left Navigation Menu Items -->
+      <nav class="p-3.5 space-y-1.5" aria-label="Sidebar">
+        
+        <button onclick="switchTab('tab-home')" id="btn-tab-home" class="sidebar-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-semibold transition bg-blue-50 text-blue-900 border border-blue-200/80 shadow-2xs">
+          <div class="flex items-center space-x-2.5">
+            <i data-lucide="home" class="w-4 h-4 text-blue-700"></i>
+            <span>Portal Home</span>
+          </div>
+          <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-blue-600"></i>
         </button>
 
-        <button onclick="switchTab('tab-stream')" id="btn-tab-stream" class="tab-btn border-transparent text-slate-500 hover:text-slate-900 font-medium whitespace-nowrap py-3.5 px-1 border-b-2 text-sm flex items-center space-x-2">
-          <i data-lucide="activity" class="w-4 h-4 text-emerald-600"></i>
-          <span>Live Streaming Feed</span>
-          <span class="ml-1 px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-mono font-bold">LIVE</span>
+        <button onclick="switchTab('tab-stream')" id="btn-tab-stream" class="sidebar-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+          <div class="flex items-center space-x-2.5">
+            <i data-lucide="activity" class="w-4 h-4 text-emerald-600"></i>
+            <span>Live Streaming Feed</span>
+          </div>
+          <span class="px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-mono font-bold">LIVE</span>
         </button>
 
-        <button onclick="switchTab('tab-interactive')" id="btn-tab-interactive" class="tab-btn border-transparent text-slate-500 hover:text-slate-900 font-medium whitespace-nowrap py-3.5 px-1 border-b-2 text-sm flex items-center space-x-2">
-          <i data-lucide="sliders" class="w-4 h-4 text-blue-600"></i>
-          <span>Custom Underwriter (Run Own Data)</span>
+        <button onclick="switchTab('tab-interactive')" id="btn-tab-interactive" class="sidebar-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+          <div class="flex items-center space-x-2.5">
+            <i data-lucide="sliders" class="w-4 h-4 text-blue-600"></i>
+            <span>Custom Underwriter</span>
+          </div>
+          <span class="text-[10px] text-slate-400 font-mono">₹ INR</span>
         </button>
 
-        <button onclick="switchTab('tab-benchmarks')" id="btn-tab-benchmarks" class="tab-btn border-transparent text-slate-500 hover:text-slate-900 font-medium whitespace-nowrap py-3.5 px-1 border-b-2 text-sm flex items-center space-x-2">
-          <i data-lucide="badge-percent" class="w-4 h-4"></i>
-          <span>Model Benchmark (ROC-AUC 0.87)</span>
+        <button onclick="switchTab('tab-benchmarks')" id="btn-tab-benchmarks" class="sidebar-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+          <div class="flex items-center space-x-2.5">
+            <i data-lucide="badge-percent" class="w-4 h-4 text-slate-500"></i>
+            <span>Model Benchmark</span>
+          </div>
+          <span class="text-[10px] text-slate-500 font-mono font-semibold">0.87 AUC</span>
         </button>
 
-        <button onclick="switchTab('tab-azure')" id="btn-tab-azure" class="tab-btn border-transparent text-slate-500 hover:text-slate-900 font-medium whitespace-nowrap py-3.5 px-1 border-b-2 text-sm flex items-center space-x-2">
-          <i data-lucide="cloud" class="w-4 h-4"></i>
-          <span>Azure Cloud Architecture</span>
+        <button onclick="switchTab('tab-azure')" id="btn-tab-azure" class="sidebar-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-slate-100 hover:text-slate-900">
+          <div class="flex items-center space-x-2.5">
+            <i data-lucide="cloud" class="w-4 h-4 text-slate-500"></i>
+            <span>Azure Architecture</span>
+          </div>
+          <span class="text-[10px] text-slate-400 font-mono">Bicep IaC</span>
         </button>
+
       </nav>
     </div>
-  </div>
 
-  <!-- Main Work Area -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-7">
-
-    <!-- ==================== TAB 0: PORTAL HOME (ENTRY GATEWAY) ==================== -->
-    <div id="tab-home" class="tab-content block space-y-10 py-4">
-      
-      <!-- Welcome Hero Banner -->
-      <div class="text-center max-w-3xl mx-auto space-y-4">
-        <span class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-blue-800">
-          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-blue-600"></i>
-          <span>Microsoft Azure ML v2 &bull; Central India Region Compatible</span>
-        </span>
-        <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
-          Autonomous Credit Underwriting & Real-Time Risk Terminal
-        </h1>
-        <p class="text-base text-slate-600 leading-relaxed">
-          FinShield automates retail loan underwriting using calibrated Gradient Boosted Trees and real-time Adverse Action explanation engines compliant with <strong>RBI Fair Practices Code</strong> and <strong>ECOA</strong> regulations.
+    <!-- Sidebar Bottom: Capital Protection Certificate Card -->
+    <div class="p-4 border-t border-slate-200 bg-slate-50/70 space-y-3">
+      <div class="p-3.5 rounded-xl bg-white border border-emerald-200 shadow-2xs space-y-2">
+        <div class="flex items-center space-x-2 text-emerald-800 font-bold text-xs">
+          <i data-lucide="lock" class="w-3.5 h-3.5 text-emerald-600"></i>
+          <span>100% Loan Portfolio Protection</span>
+        </div>
+        <p class="text-[11px] text-slate-600 leading-snug">
+          Every loan is audited by FinShield to prevent balance sheet defaults & regulatory penalties under RBI standards.
         </p>
-      </div>
-
-      <!-- THE TWO PRIMARY CHOICES (Large Interactive Cards) -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-        
-        <!-- CHOICE 1: LIVE DATA STREAM -->
-        <div class="bg-white rounded-2xl border-2 border-slate-200 hover:border-emerald-500 p-8 shadow-xs hover:shadow-md transition duration-200 flex flex-col justify-between group">
-          <div class="space-y-4">
-            <div class="flex items-center justify-between">
-              <div class="w-14 h-14 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 group-hover:scale-105 transition">
-                <i data-lucide="radio" class="w-7 h-7 live-dot"></i>
-              </div>
-              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 mr-1.5 live-dot"></span>
-                ACTIVE FEED (2.0s)
-              </span>
-            </div>
-
-            <div>
-              <h2 class="text-xl font-bold text-slate-900 group-hover:text-emerald-700 transition">
-                Option 1: Live Streaming Feed
-              </h2>
-              <span class="text-xs font-mono text-slate-500 font-semibold block mt-0.5">Azure Event Hubs &bull; Stream Analytics Hot Path</span>
-            </div>
-
-            <p class="text-sm text-slate-600 leading-relaxed">
-              Monitor continuous retail credit applications streaming in every 2 seconds. Demonstrates sub-40ms scoring latency, real-time approval ratios, and dynamic Adverse Action extraction.
-            </p>
-
-            <ul class="space-y-2 text-xs text-slate-600 font-medium pt-2">
-              <li class="flex items-center space-x-2">
-                <i data-lucide="check" class="w-4 h-4 text-emerald-600"></i>
-                <span>Automated application generation with INR salaries & loan sizes</span>
-              </li>
-              <li class="flex items-center space-x-2">
-                <i data-lucide="check" class="w-4 h-4 text-emerald-600"></i>
-                <span>Live KPI tickers: Ingestion Count, Approval %, Latency</span>
-              </li>
-              <li class="flex items-center space-x-2">
-                <i data-lucide="check" class="w-4 h-4 text-emerald-600"></i>
-                <span>Pause & resume stream controls for presentation freeze</span>
-              </li>
-            </ul>
-          </div>
-
-          <div class="pt-6">
-            <button onclick="switchTab('tab-stream')" class="w-full py-3.5 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md shadow-emerald-600/20 flex items-center justify-center space-x-2 transition">
-              <span>Launch Live Streaming Terminal</span>
-              <i data-lucide="arrow-right" class="w-4 h-4"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- CHOICE 2: RUN OWN CUSTOM DATA -->
-        <div class="bg-white rounded-2xl border-2 border-slate-200 hover:border-blue-600 p-8 shadow-xs hover:shadow-md transition duration-200 flex flex-col justify-between group">
-          <div class="space-y-4">
-            <div class="flex items-center justify-between">
-              <div class="w-14 h-14 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700 group-hover:scale-105 transition">
-                <i data-lucide="sliders" class="w-7 h-7"></i>
-              </div>
-              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
-                INTERACTIVE AUDIT
-              </span>
-            </div>
-
-            <div>
-              <h2 class="text-xl font-bold text-slate-900 group-hover:text-blue-700 transition">
-                Option 2: Run Your Own Data
-              </h2>
-              <span class="text-xs font-mono text-slate-500 font-semibold block mt-0.5">Interactive Underwriting & Explainable AI</span>
-            </div>
-
-            <p class="text-sm text-slate-600 leading-relaxed">
-              Input custom financial applicant details (Annual Income, Loan Amount, CIBIL Score, DTI in ₹ INR), or test one-click presets to inspect real-time risk gauges and formal Adverse Action notices.
-            </p>
-
-            <ul class="space-y-2 text-xs text-slate-600 font-medium pt-2">
-              <li class="flex items-center space-x-2">
-                <i data-lucide="check" class="w-4 h-4 text-blue-600"></i>
-                <span>Interactive sliders for FICO/CIBIL, DTI %, and Credit Card Utilization</span>
-              </li>
-              <li class="flex items-center space-x-2">
-                <i data-lucide="check" class="w-4 h-4 text-blue-600"></i>
-                <span>One-click audit presets: Prime Approval vs. Subprime Decline</span>
-              </li>
-              <li class="flex items-center space-x-2">
-                <i data-lucide="check" class="w-4 h-4 text-blue-600"></i>
-                <span>Formal RBI Fair Practices Adverse Action legal statement</span>
-              </li>
-            </ul>
-          </div>
-
-          <div class="pt-6">
-            <button onclick="switchTab('tab-interactive')" class="w-full py-3.5 px-5 rounded-xl bg-blue-800 hover:bg-blue-900 text-white font-bold text-sm shadow-md shadow-blue-900/20 flex items-center justify-center space-x-2 transition">
-              <span>Launch Custom Underwriting Terminal</span>
-              <i data-lucide="arrow-right" class="w-4 h-4"></i>
-            </button>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Quick Platform Pillars Footer on Home -->
-      <div class="max-w-5xl mx-auto pt-6 border-t border-slate-200">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-          <div class="bg-white p-4 rounded-xl border border-slate-200">
-            <span class="text-xs text-slate-500 font-medium">Model Discrimination</span>
-            <span class="text-xl font-extrabold font-mono text-slate-900 block mt-0.5">ROC-AUC 0.8716</span>
-          </div>
-          <div class="bg-white p-4 rounded-xl border border-slate-200">
-            <span class="text-xs text-slate-500 font-medium">Credit Committee Metric</span>
-            <span class="text-xl font-extrabold font-mono text-slate-900 block mt-0.5">Gini 0.7432</span>
-          </div>
-          <div class="bg-white p-4 rounded-xl border border-slate-200">
-            <span class="text-xs text-slate-500 font-medium">Underwriting Latency</span>
-            <span class="text-xl font-extrabold font-mono text-emerald-700 block mt-0.5">38.4 ms</span>
-          </div>
-          <div class="bg-white p-4 rounded-xl border border-slate-200">
-            <span class="text-xs text-slate-500 font-medium">Compliance Framework</span>
-            <span class="text-xl font-extrabold font-mono text-blue-800 block mt-0.5">RBI Fair Code</span>
-          </div>
+        <div class="pt-1 flex items-center justify-between text-[10px] font-mono font-semibold text-slate-500 border-t border-slate-100">
+          <span>Protected Capital:</span>
+          <span class="text-slate-900">₹428.5 Cr</span>
         </div>
       </div>
 
+      <div class="flex items-center justify-between text-xs px-1 text-slate-500 font-mono">
+        <div class="flex items-center space-x-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 live-dot"></span>
+          <span class="text-[11px] text-slate-700">Event Hubs Active</span>
+        </div>
+        <span class="text-[11px] font-semibold text-blue-800">38ms Latency</span>
+      </div>
     </div>
 
-    <!-- ==================== TAB 1: LIVE STREAMING INGESTION ==================== -->
-    <div id="tab-stream" class="tab-content hidden space-y-6">
+  </aside>
 
-      <!-- Breadcrumb Bar -->
-      <div class="flex items-center justify-between">
-        <button onclick="switchTab('tab-home')" class="text-xs font-semibold text-blue-700 hover:text-blue-900 flex items-center space-x-1">
-          <i data-lucide="chevron-left" class="w-4 h-4"></i>
-          <span>Back to Portal Home</span>
-        </button>
-        <span class="text-xs text-slate-500 font-mono">Stream Mode: Azure Event Hubs Real-Time Feed</span>
+  <!-- ========================================================== -->
+  <!-- MAIN DISPLAY AREA (Right Side) -->
+  <!-- ========================================================== -->
+  <div class="flex-1 flex flex-col min-w-0 rbi-bg-watermark min-h-screen">
+    
+    <!-- Top Bar with RBI Governance Seal -->
+    <header class="bg-white/85 backdrop-blur border-b border-slate-200 px-6 py-3.5 flex items-center justify-between sticky top-0 z-30">
+      <div class="flex items-center space-x-3">
+        <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-blue-900">
+          <i data-lucide="landmark" class="w-3.5 h-3.5 text-blue-700"></i>
+          <span>RBI Headquarter Regulatory Architecture &bull; Central Banking Standard</span>
+        </span>
       </div>
 
-      <!-- Stream Control & Metric Stats Banner -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="flex items-center space-x-3">
+        <span class="hidden sm:inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+          <i data-lucide="shield" class="w-3.5 h-3.5 mr-1 text-emerald-600"></i>
+          <span>All Loans Protected by FinShield</span>
+        </span>
+        <a href="https://github.com/moryesoham4-SR/finshield-credit-risk-mlops" target="_blank" class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-medium text-xs shadow-2xs transition">
+          <i data-lucide="git-branch" class="w-3.5 h-3.5 text-slate-500"></i>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Main Dynamic Content Workspace -->
+    <main class="flex-1 p-6 md:p-8 max-w-6xl w-full mx-auto space-y-7">
+
+      <!-- ==================== TAB 0: PORTAL HOME ==================== -->
+      <div id="tab-home" class="tab-content block space-y-8">
         
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-2xs flex items-center justify-between">
-          <div>
-            <span class="text-xs font-medium text-slate-500 block uppercase tracking-wider">Stream State</span>
-            <div class="flex items-center space-x-2 mt-1">
-              <span id="stream-status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 live-dot"></span>
-              <span id="stream-status-text" class="text-base font-bold text-slate-900 font-mono">STREAMING</span>
+        <!-- RBI Protection Hero Banner -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-8 shadow-xs relative overflow-hidden">
+          <div class="max-w-2xl space-y-4 relative z-10">
+            <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-800">
+              <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
+              <span>CAPITAL PROTECTION & UNDERWRITING PROTOCOL</span>
+            </span>
+
+            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+              Institutional Retail Credit Governance & Underwriting
+            </h1>
+
+            <p class="text-sm md:text-base text-slate-600 leading-relaxed">
+              Every loan processed through FinShield is protected by our calibrated Gradient Boosted Trees risk engine. Automated <strong>RBI Fair Practices Code</strong> Adverse Action reason codes protect lending institutions from credit default shocks and compliance liabilities.
+            </p>
+          </div>
+
+          <!-- Subtle Emblem / Watermark Badge inside Banner -->
+          <div class="absolute right-4 bottom-4 md:right-8 md:top-8 opacity-10 pointer-events-none hidden md:block">
+            <i data-lucide="landmark" class="w-44 h-44 text-blue-950"></i>
+          </div>
+        </div>
+
+        <!-- THE TWO SELECTION CHOICES -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-7">
+          
+          <!-- OPTION 1: LIVE STREAM -->
+          <div class="bg-white rounded-2xl border-2 border-slate-200 hover:border-emerald-600 p-7 shadow-xs hover:shadow-md transition duration-200 flex flex-col justify-between group">
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="w-13 h-13 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 group-hover:scale-105 transition">
+                  <i data-lucide="radio" class="w-6 h-6 live-dot"></i>
+                </div>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 mr-1.5 live-dot"></span>
+                  STREAMING FEED (2.0s)
+                </span>
+              </div>
+
+              <div>
+                <h2 class="text-xl font-bold text-slate-900 group-hover:text-emerald-700 transition">
+                  Option 1: Live Streaming Feed
+                </h2>
+                <span class="text-xs font-mono text-slate-500 font-semibold block mt-0.5">Azure Event Hubs &bull; Stream Analytics Hot Path</span>
+              </div>
+
+              <p class="text-sm text-slate-600 leading-relaxed">
+                Monitor live simulated retail loan applications streaming every 2.0s in ₹ INR. Observe real-time underwriting decisions, sub-40ms latency, and automated logging.
+              </p>
+
+              <ul class="space-y-2 text-xs text-slate-600 font-medium pt-1">
+                <li class="flex items-center space-x-2">
+                  <i data-lucide="check" class="w-4 h-4 text-emerald-600"></i>
+                  <span>Streaming application generation in authentic INR salaries & loan sizes</span>
+                </li>
+                <li class="flex items-center space-x-2">
+                  <i data-lucide="check" class="w-4 h-4 text-emerald-600"></i>
+                  <span>Live approval rate ticker (calibrated to ~84.2%)</span>
+                </li>
+                <li class="flex items-center space-x-2">
+                  <i data-lucide="check" class="w-4 h-4 text-emerald-600"></i>
+                  <span>Pause & resume stream controls for presentation freeze</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="pt-6">
+              <button onclick="switchTab('tab-stream')" class="w-full py-3.5 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-md shadow-emerald-600/20 flex items-center justify-center space-x-2 transition">
+                <span>Launch Live Streaming Terminal</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
             </div>
           </div>
-          <button id="btn-toggle-stream" onclick="toggleStreaming()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition">
-            ⏸️ Pause
-          </button>
-        </div>
 
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-2xs">
-          <span class="text-xs font-medium text-slate-500 block uppercase tracking-wider">Total Evaluated (INR)</span>
-          <span id="stat-total-streamed" class="text-2xl font-extrabold text-slate-900 font-mono mt-1 block">1,842</span>
-          <span class="text-[11px] text-slate-500">Live applications ingested</span>
-        </div>
+          <!-- OPTION 2: RUN OWN CUSTOM DATA -->
+          <div class="bg-white rounded-2xl border-2 border-slate-200 hover:border-blue-700 p-7 shadow-xs hover:shadow-md transition duration-200 flex flex-col justify-between group">
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="w-13 h-13 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700 group-hover:scale-105 transition">
+                  <i data-lucide="sliders" class="w-6 h-6"></i>
+                </div>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-900 border border-blue-200">
+                  RUN OWN DATA
+                </span>
+              </div>
 
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-2xs">
-          <span class="text-xs font-medium text-slate-500 block uppercase tracking-wider">Approval Rate</span>
-          <span id="stat-approval-rate" class="text-2xl font-extrabold text-emerald-700 font-mono mt-1 block">84.2%</span>
-          <span class="text-[11px] text-slate-500">RBI risk appetite aligned</span>
-        </div>
+              <div>
+                <h2 class="text-xl font-bold text-slate-900 group-hover:text-blue-800 transition">
+                  Option 2: Custom Loan Underwriter
+                </h2>
+                <span class="text-xs font-mono text-slate-500 font-semibold block mt-0.5">Interactive Audit & Explainable AI</span>
+              </div>
 
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-2xs">
-          <span class="text-xs font-medium text-slate-500 block uppercase tracking-wider">Avg Response Time</span>
-          <span class="text-2xl font-extrabold text-blue-700 font-mono mt-1 block">38.4 ms</span>
-          <span class="text-[11px] text-slate-500">Azure ML Managed Endpoint</span>
+              <p class="text-sm text-slate-600 leading-relaxed">
+                Input your own custom financial applicant metrics (Annual Income, Loan Amount, CIBIL Score, DTI in ₹ INR), or test audit presets to inspect real-time risk gauges and RBI Adverse Action notices.
+              </p>
+
+              <ul class="space-y-2 text-xs text-slate-600 font-medium pt-1">
+                <li class="flex items-center space-x-2">
+                  <i data-lucide="check" class="w-4 h-4 text-blue-600"></i>
+                  <span>Interactive sliders for CIBIL, DTI %, and Credit Utilization</span>
+                </li>
+                <li class="flex items-center space-x-2">
+                  <i data-lucide="check" class="w-4 h-4 text-blue-600"></i>
+                  <span>One-click audit presets: Prime Approval vs. Subprime Decline</span>
+                </li>
+                <li class="flex items-center space-x-2">
+                  <i data-lucide="check" class="w-4 h-4 text-blue-600"></i>
+                  <span>Mandated RBI Fair Practices Adverse Action legal notice</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="pt-6">
+              <button onclick="switchTab('tab-interactive')" class="w-full py-3.5 px-5 rounded-xl bg-blue-800 hover:bg-blue-900 text-white font-bold text-sm shadow-md shadow-blue-900/20 flex items-center justify-center space-x-2 transition">
+                <span>Launch Custom Underwriting Terminal</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
         </div>
 
       </div>
 
-      <!-- Live Incoming Stream Feed Table -->
-      <div class="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden">
-        <div class="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+      <!-- ==================== TAB 1: LIVE STREAM FEED ==================== -->
+      <div id="tab-stream" class="tab-content hidden space-y-6">
+
+        <!-- Top Breadcrumb -->
+        <div class="flex items-center justify-between">
+          <button onclick="switchTab('tab-home')" class="text-xs font-semibold text-blue-800 hover:text-blue-950 flex items-center space-x-1">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            <span>Back to Portal Home</span>
+          </button>
+          <span class="text-xs text-slate-500 font-mono">Stream Feed &bull; Azure Event Hubs Real-Time</span>
+        </div>
+
+        <!-- Metric KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-2xs flex items-center justify-between">
+            <div>
+              <span class="text-xs font-medium text-slate-500 block uppercase tracking-wider">Stream State</span>
+              <div class="flex items-center space-x-2 mt-1">
+                <span id="stream-status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 live-dot"></span>
+                <span id="stream-status-text" class="text-base font-bold text-slate-900 font-mono">STREAMING</span>
+              </div>
+            </div>
+            <button id="btn-toggle-stream" onclick="toggleStreaming()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition">
+              ⏸️ Pause
+            </button>
+          </div>
+
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-2xs">
+            <span class="text-xs font-medium text-slate-500 block uppercase tracking-wider">Total Evaluated (INR)</span>
+            <span id="stat-total-streamed" class="text-2xl font-extrabold text-slate-900 font-mono mt-1 block">1,842</span>
+            <span class="text-[11px] text-slate-500">Live applications ingested</span>
+          </div>
+
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-2xs">
+            <span class="text-xs font-medium text-slate-500 block uppercase tracking-wider">Approval Rate</span>
+            <span id="stat-approval-rate" class="text-2xl font-extrabold text-emerald-700 font-mono mt-1 block">84.2%</span>
+            <span class="text-[11px] text-slate-500">RBI risk appetite aligned</span>
+          </div>
+
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-2xs">
+            <span class="text-xs font-medium text-slate-500 block uppercase tracking-wider">Avg Latency</span>
+            <span class="text-2xl font-extrabold text-blue-700 font-mono mt-1 block">38.4 ms</span>
+            <span class="text-[11px] text-slate-500">Azure ML Managed Endpoint</span>
+          </div>
+        </div>
+
+        <!-- Live Feed Table -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden">
+          <div class="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="radio" class="w-4 h-4 text-emerald-600 live-dot"></i>
+              <h3 class="text-sm font-bold text-slate-800">Live Ingested Retail Credit Applications (INR Currency &bull; Event Hubs)</h3>
+            </div>
+            <span class="text-xs font-mono text-slate-500">Streaming every 2.0s</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-100/70 text-slate-600 font-semibold border-b border-slate-200">
+                  <th class="py-3 px-4">Timestamp</th>
+                  <th class="py-3 px-4">Application ID</th>
+                  <th class="py-3 px-4">Annual Income (₹)</th>
+                  <th class="py-3 px-4">Loan Amount (₹)</th>
+                  <th class="py-3 px-4">CIBIL / FICO</th>
+                  <th class="py-3 px-4">DTI Ratio</th>
+                  <th class="py-3 px-4">Calibrated Risk</th>
+                  <th class="py-3 px-4">Underwriting Decision</th>
+                  <th class="py-3 px-4">Adverse Action Reason (RBI Standards)</th>
+                </tr>
+              </thead>
+              <tbody id="stream-tbody" class="divide-y divide-slate-100 font-mono">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ==================== TAB 2: CUSTOM UNDERWRITER ==================== -->
+      <div id="tab-interactive" class="tab-content hidden space-y-6">
+
+        <!-- Top Breadcrumb -->
+        <div class="flex items-center justify-between">
+          <button onclick="switchTab('tab-home')" class="text-xs font-semibold text-blue-800 hover:text-blue-950 flex items-center space-x-1">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            <span>Back to Portal Home</span>
+          </button>
+          <span class="text-xs text-slate-500 font-mono">Interactive Underwriter &bull; Custom Evaluation</span>
+        </div>
+
+        <!-- Presets -->
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div class="flex items-center space-x-2">
-            <i data-lucide="radio" class="w-4 h-4 text-emerald-600 live-dot"></i>
-            <h3 class="text-sm font-bold text-slate-800">Live Ingested Retail Credit Applications (INR Currency &bull; Event Hubs)</h3>
+            <i data-lucide="bookmark-check" class="w-4 h-4 text-blue-700"></i>
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Audit Presets for Evaluator:</span>
           </div>
-          <span class="text-xs font-mono text-slate-500">Streaming every 2.0s</span>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="loadPreset('prime')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition shadow-2xs">
+              ✅ Profile A: Prime Borrower (₹18 Lakhs Income &bull; Approved)
+            </button>
+            <button onclick="loadPreset('subprime')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100 transition shadow-2xs">
+              ❌ Profile B: Subprime Borrower (₹3.5 Lakhs Income &bull; Adverse Action)
+            </button>
+            <button onclick="loadPreset('borderline')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 transition shadow-2xs">
+              ⚖️ Profile C: Near-Prime Borderline (₹7.5 Lakhs Income)
+            </button>
+          </div>
         </div>
 
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr class="bg-slate-100/70 text-slate-600 font-semibold border-b border-slate-200">
-                <th class="py-3 px-4">Timestamp</th>
-                <th class="py-3 px-4">Application ID</th>
-                <th class="py-3 px-4">Annual Income (₹)</th>
-                <th class="py-3 px-4">Loan Amount (₹)</th>
-                <th class="py-3 px-4">CIBIL / FICO</th>
-                <th class="py-3 px-4">DTI Ratio</th>
-                <th class="py-3 px-4">Calibrated Risk</th>
-                <th class="py-3 px-4">Underwriting Decision</th>
-                <th class="py-3 px-4">Adverse Action Reason (RBI / Fair Credit)</th>
-              </tr>
-            </thead>
-            <tbody id="stream-tbody" class="divide-y divide-slate-100 font-mono">
-              <!-- Populated continuously by JS -->
-            </tbody>
-          </table>
-        </div>
-      </div>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-7">
 
-    </div>
+          <!-- Controls (7 Cols) -->
+          <div class="lg:col-span-7 bg-white rounded-xl border border-slate-200 p-6 shadow-2xs space-y-6">
+            <div class="border-b border-slate-100 pb-3">
+              <h3 class="text-base font-bold text-slate-900 flex items-center space-x-2">
+                <i data-lucide="file-text" class="w-4 h-4 text-blue-700"></i>
+                <span>Credit Application Dossier (INR)</span>
+              </h3>
+              <p class="text-xs text-slate-500 mt-0.5">Input custom applicant details to test the underwriting algorithm.</p>
+            </div>
 
-    <!-- ==================== TAB 2: INTERACTIVE UNDERWRITING SIMULATOR ==================== -->
-    <div id="tab-interactive" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1.5">Annual Verified Income (₹)</label>
+                <input type="number" id="in-income" value="1800000" step="50000" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2 text-slate-900 font-mono text-sm focus:bg-white focus:border-blue-700 focus:outline-none transition">
+                <span id="lbl-income-in-words" class="text-[11px] text-blue-700 font-mono mt-1 block">₹18,00,000 (18 Lakhs)</span>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1.5">Requested Loan Amount (₹)</label>
+                <input type="number" id="in-loan" value="400000" step="25000" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2 text-slate-900 font-mono text-sm focus:bg-white focus:border-blue-700 focus:outline-none transition">
+                <span id="lbl-loan-in-words" class="text-[11px] text-blue-700 font-mono mt-1 block">₹4,00,000 (4 Lakhs)</span>
+              </div>
+            </div>
 
-      <!-- Breadcrumb Bar -->
-      <div class="flex items-center justify-between">
-        <button onclick="switchTab('tab-home')" class="text-xs font-semibold text-blue-700 hover:text-blue-900 flex items-center space-x-1">
-          <i data-lucide="chevron-left" class="w-4 h-4"></i>
-          <span>Back to Portal Home</span>
-        </button>
-        <span class="text-xs text-slate-500 font-mono">Custom Input Mode: Interactive Underwriter</span>
-      </div>
+            <!-- FICO Slider -->
+            <div class="space-y-1.5 bg-slate-50 p-4 rounded-lg border border-slate-200">
+              <div class="flex justify-between items-center text-xs">
+                <span class="font-semibold text-slate-700">Bureau Credit Score (CIBIL / FICO Standard)</span>
+                <span id="val-score" class="font-mono font-bold text-sm text-blue-800 bg-blue-100/70 px-2.5 py-0.5 rounded border border-blue-200">780</span>
+              </div>
+              <input type="range" id="in-score" min="300" max="850" value="780" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-blue-700">
+              <div class="flex justify-between text-[10px] text-slate-500 font-mono pt-1">
+                <span>300 (Subprime)</span>
+                <span>600</span>
+                <span>670 (Prime Cutoff)</span>
+                <span>750</span>
+                <span>850 (Exceptional)</span>
+              </div>
+            </div>
 
-      <!-- Preset Selection Banner -->
-      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div class="flex items-center space-x-2">
-          <i data-lucide="bookmark-check" class="w-4 h-4 text-blue-700"></i>
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Quick Audit Presets for Evaluator:</span>
-        </div>
-        <div class="flex flex-wrap gap-2">
-          <button onclick="loadPreset('prime')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition shadow-2xs">
-            ✅ Profile A: Prime Borrower (₹18 Lakhs Income &bull; Approved)
-          </button>
-          <button onclick="loadPreset('subprime')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100 transition shadow-2xs">
-            ❌ Profile B: Subprime Borrower (₹3.5 Lakhs Income &bull; Adverse Action)
-          </button>
-          <button onclick="loadPreset('borderline')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 transition shadow-2xs">
-            ⚖️ Profile C: Near-Prime Borderline (₹7.5 Lakhs Income)
-          </button>
-        </div>
-      </div>
+            <!-- Revolving Utilization -->
+            <div class="space-y-1.5 bg-slate-50 p-4 rounded-lg border border-slate-200">
+              <div class="flex justify-between items-center text-xs">
+                <span class="font-semibold text-slate-700">Credit Card Balance Utilization Rate</span>
+                <span id="val-util" class="font-mono font-bold text-sm text-blue-800 bg-blue-100/70 px-2.5 py-0.5 rounded border border-blue-200">12%</span>
+              </div>
+              <input type="range" id="in-util" min="0" max="110" value="12" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-blue-700">
+              <div class="flex justify-between text-[10px] text-slate-500 font-mono pt-1">
+                <span>0% (Clean)</span>
+                <span>30% (Standard Limit)</span>
+                <span>60% (Elevated Strain)</span>
+                <span>100%+ (Maxed Out)</span>
+              </div>
+            </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-7">
+            <!-- DTI Slider -->
+            <div class="space-y-1.5 bg-slate-50 p-4 rounded-lg border border-slate-200">
+              <div class="flex justify-between items-center text-xs">
+                <span class="font-semibold text-slate-700">Debt-to-Income (Fixed Monthly EMI / Income Ratio)</span>
+                <span id="val-dti" class="font-mono font-bold text-sm text-blue-800 bg-blue-100/70 px-2.5 py-0.5 rounded border border-blue-200">18%</span>
+              </div>
+              <input type="range" id="in-dti" min="5" max="75" value="18" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-blue-700">
+              <div class="flex justify-between text-[10px] text-slate-500 font-mono pt-1">
+                <span>5% (Low Burden)</span>
+                <span>36% (Underwriting Cap)</span>
+                <span>50%+ (High Default Probability)</span>
+              </div>
+            </div>
 
-        <!-- Controls Column (7 Cols) -->
-        <div class="lg:col-span-7 bg-white rounded-xl border border-slate-200 p-6 shadow-2xs space-y-6">
-          <div class="border-b border-slate-100 pb-3">
-            <h3 class="text-base font-bold text-slate-900 flex items-center space-x-2">
-              <i data-lucide="file-text" class="w-4 h-4 text-blue-700"></i>
-              <span>Credit Application Dossier (INR)</span>
-            </h3>
-            <p class="text-xs text-slate-500 mt-0.5">Input your own financial parameters to test the underwriting algorithm.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Delinquent EMIs (2 Yrs)</label>
+                <select id="in-delinq" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-mono text-xs focus:bg-white focus:border-blue-700 focus:outline-none">
+                  <option value="0">0 Late Payments</option>
+                  <option value="1">1 EMI Missed (30+ Days)</option>
+                  <option value="2">2 EMIs Missed</option>
+                  <option value="3">3+ EMIs Missed</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Interest APR (%)</label>
+                <input type="number" id="in-rate" value="8.5" step="0.25" min="6.0" max="32.0" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-mono text-xs focus:bg-white focus:border-blue-700 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Work Tenure (Yrs)</label>
+                <input type="number" id="in-emp" value="8" step="1" min="0" max="40" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-mono text-xs focus:bg-white focus:border-blue-700 focus:outline-none">
+              </div>
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <!-- Decision Output (5 Cols) -->
+          <div class="lg:col-span-5 space-y-6">
+
+            <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-2xs flex flex-col items-center text-center">
+              <div id="decision-banner" class="w-full py-3 px-4 rounded-lg font-bold text-xs tracking-wider uppercase mb-5 flex items-center justify-center space-x-2 bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs">
+                <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-700"></i>
+                <span id="decision-text">UNDERWRITING: APPROVED (Prime Tier)</span>
+              </div>
+
+              <!-- Radial Gauge -->
+              <div class="relative w-44 h-44 flex items-center justify-center">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
+                  <circle cx="60" cy="60" r="50" stroke="#e2e8f0" stroke-width="9" fill="transparent"/>
+                  <circle id="gauge-bar" cx="60" cy="60" r="50" stroke="#059669" stroke-width="9" stroke-linecap="round" fill="transparent" stroke-dasharray="314.159" stroke-dashoffset="305" class="gauge-circle"/>
+                </svg>
+                <div class="absolute flex flex-col items-center justify-center">
+                  <span id="gauge-value" class="text-3xl font-extrabold font-mono text-slate-900">2.4%</span>
+                  <span class="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mt-0.5">Default Risk</span>
+                </div>
+              </div>
+
+              <p id="decision-sub" class="text-xs text-slate-600 mt-4 leading-relaxed">
+                Calibrated default probability is well within the institutional ceiling of <strong class="text-slate-900">35.0%</strong>.
+              </p>
+            </div>
+
+            <!-- Adverse Action Notice -->
+            <div id="adverse-card" class="bg-rose-50/60 border border-rose-200 rounded-xl p-5 shadow-2xs hidden">
+              <div class="flex items-start space-x-3">
+                <div class="p-2 rounded-lg bg-rose-100 text-rose-800 mt-0.5">
+                  <i data-lucide="alert-octagon" class="w-5 h-5"></i>
+                </div>
+                <div class="space-y-2 flex-1">
+                  <div class="flex items-center justify-between">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-rose-900">Mandated Adverse Action Statement</h4>
+                    <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-200/60 text-rose-800 font-semibold">RBI Fair Lending</span>
+                  </div>
+                  <p class="text-xs text-slate-600 leading-relaxed">
+                    Under the Fair Credit Practices Code, the applicant is hereby provided the key adverse factors for loan declination:
+                  </p>
+                  <div id="adverse-list" class="space-y-2 pt-1 text-xs">
+                    <!-- Dynamic -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Financial Signal Indicators -->
+            <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs">
+              <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-3">Model Transformed Financial Signals</span>
+              <div class="grid grid-cols-3 gap-3 text-center">
+                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                  <span class="text-[10px] text-slate-500 block font-medium">Revolving Stress</span>
+                  <span id="sig-stress" class="text-sm font-bold font-mono text-slate-900 mt-0.5 block">0.08</span>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                  <span class="text-[10px] text-slate-500 block font-medium">Monthly EMI Burden</span>
+                  <span id="sig-burden" class="text-sm font-bold font-mono text-slate-900 mt-0.5 block">4.4%</span>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                  <span class="text-[10px] text-slate-500 block font-medium">Income / Loan</span>
+                  <span id="sig-ratio" class="text-sm font-bold font-mono text-slate-900 mt-0.5 block">4.5x</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ==================== TAB 3: BENCHMARKS ==================== -->
+      <div id="tab-benchmarks" class="tab-content hidden space-y-6">
+        
+        <div class="flex items-center justify-between">
+          <button onclick="switchTab('tab-home')" class="text-xs font-semibold text-blue-800 hover:text-blue-950 flex items-center space-x-1">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            <span>Back to Portal Home</span>
+          </button>
+          <span class="text-xs text-slate-500 font-mono">Statistical Audit Metrics</span>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-2xs space-y-5">
+          <div>
+            <span class="text-xs font-bold text-blue-700 uppercase tracking-wider block">Audited Test Performance</span>
+            <h3 class="text-lg font-bold text-slate-900 mt-0.5">Financial Regulatory Model Benchmark</h3>
+            <p class="text-xs text-slate-500">Evaluated on a strictly held-out 20% test partition (2,000 credit applications).</p>
+          </div>
+
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+              <span class="text-xs text-slate-500 font-medium block">ROC-AUC</span>
+              <span class="text-2xl font-extrabold font-mono text-slate-900 mt-1 block">0.8716</span>
+              <span class="text-[11px] text-emerald-700 font-semibold mt-1 block">Target: &ge; 0.75</span>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+              <span class="text-xs text-slate-500 font-medium block">Gini Coefficient</span>
+              <span class="text-2xl font-extrabold font-mono text-slate-900 mt-1 block">0.7432</span>
+              <span class="text-[11px] text-emerald-700 font-semibold mt-1 block">Basel III / Risk Committee Std</span>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+              <span class="text-xs text-slate-500 font-medium block">PR-AUC (Avg Precision)</span>
+              <span class="text-2xl font-extrabold font-mono text-slate-900 mt-1 block">0.6158</span>
+              <span class="text-[11px] text-emerald-700 font-semibold mt-1 block">4x over base default rate</span>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+              <span class="text-xs text-slate-500 font-medium block">Brier Score Loss</span>
+              <span class="text-2xl font-extrabold font-mono text-slate-900 mt-1 block">0.0878</span>
+              <span class="text-[11px] text-emerald-700 font-semibold mt-1 block">3-Fold Sigmoid Calibrated</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature Importances -->
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-2xs space-y-4">
+          <h4 class="text-sm font-bold text-slate-900">Global Feature Attribution Breakdown</h4>
+          <p class="text-xs text-slate-500">Relative contribution to credit default risk probability according to Gradient Boosted Decision Trees:</p>
+
+          <div class="space-y-3.5 font-mono text-xs pt-2">
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1.5">Annual Verified Income (₹)</label>
-              <input type="number" id="in-income" value="1800000" step="50000" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2 text-slate-900 font-mono text-sm focus:bg-white focus:border-blue-700 focus:ring-1 focus:ring-blue-700 focus:outline-none transition">
-              <span id="lbl-income-in-words" class="text-[11px] text-blue-700 font-mono mt-1 block">₹18,00,000 (18 Lakhs)</span>
+              <div class="flex justify-between text-slate-700 mb-1">
+                <span>credit_score (CIBIL / FICO Score)</span>
+                <span class="font-bold text-blue-900">32.6%</span>
+              </div>
+              <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                <div class="bg-blue-700 h-full rounded-full" style="width: 32.6%"></div>
+              </div>
             </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1.5">Requested Loan Amount (₹)</label>
-              <input type="number" id="in-loan" value="400000" step="25000" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2 text-slate-900 font-mono text-sm focus:bg-white focus:border-blue-700 focus:ring-1 focus:ring-blue-700 focus:outline-none transition">
-              <span id="lbl-loan-in-words" class="text-[11px] text-blue-700 font-mono mt-1 block">₹4,00,000 (4 Lakhs)</span>
+              <div class="flex justify-between text-slate-700 mb-1">
+                <span>revolving_stress (Credit Utilization &times; Score Deficit)</span>
+                <span class="font-bold text-blue-900">24.2%</span>
+              </div>
+              <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                <div class="bg-blue-700 h-full rounded-full" style="width: 24.2%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-slate-700 mb-1">
+                <span>debt_to_income (Monthly EMI to Income)</span>
+                <span class="font-bold text-blue-900">9.8%</span>
+              </div>
+              <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                <div class="bg-blue-700 h-full rounded-full" style="width: 9.8%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-slate-700 mb-1">
+                <span>delinquency_severity (Late Payments &times; DTI)</span>
+                <span class="font-bold text-blue-900">8.8%</span>
+              </div>
+              <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                <div class="bg-blue-700 h-full rounded-full" style="width: 8.8%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-slate-700 mb-1">
+                <span>interest_rate APR</span>
+                <span class="font-bold text-blue-900">8.3%</span>
+              </div>
+              <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                <div class="bg-blue-700 h-full rounded-full" style="width: 8.3%"></div>
+              </div>
             </div>
           </div>
+        </div>
 
-          <!-- Slider: CIBIL / FICO Score -->
-          <div class="space-y-1.5 bg-slate-50 p-4 rounded-lg border border-slate-200">
-            <div class="flex justify-between items-center text-xs">
-              <span class="font-semibold text-slate-700">Bureau Credit Score (CIBIL / FICO Standard)</span>
-              <span id="val-score" class="font-mono font-bold text-sm text-blue-800 bg-blue-100/70 px-2.5 py-0.5 rounded border border-blue-200">780</span>
-            </div>
-            <input type="range" id="in-score" min="300" max="850" value="780" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-blue-700">
-            <div class="flex justify-between text-[10px] text-slate-500 font-mono pt-1">
-              <span>300 (Poor / Subprime)</span>
-              <span>600</span>
-              <span>670 (Prime Cutoff)</span>
-              <span>750</span>
-              <span>850 (Exceptional)</span>
-            </div>
-          </div>
+      </div>
 
-          <!-- Slider: Revolving Utilization -->
-          <div class="space-y-1.5 bg-slate-50 p-4 rounded-lg border border-slate-200">
-            <div class="flex justify-between items-center text-xs">
-              <span class="font-semibold text-slate-700">Credit Card Balance Utilization Rate</span>
-              <span id="val-util" class="font-mono font-bold text-sm text-blue-800 bg-blue-100/70 px-2.5 py-0.5 rounded border border-blue-200">12%</span>
-            </div>
-            <input type="range" id="in-util" min="0" max="110" value="12" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-blue-700">
-            <div class="flex justify-between text-[10px] text-slate-500 font-mono pt-1">
-              <span>0% (Clean)</span>
-              <span>30% (Standard Limit)</span>
-              <span>60% (Elevated Strain)</span>
-              <span>100%+ (Maxed Out)</span>
-            </div>
-          </div>
+      <!-- ==================== TAB 4: AZURE CLOUD ARCHITECTURE ==================== -->
+      <div id="tab-azure" class="tab-content hidden space-y-6">
+        
+        <div class="flex items-center justify-between">
+          <button onclick="switchTab('tab-home')" class="text-xs font-semibold text-blue-800 hover:text-blue-950 flex items-center space-x-1">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            <span>Back to Portal Home</span>
+          </button>
+          <span class="text-xs text-slate-500 font-mono">Infrastructure as Code</span>
+        </div>
 
-          <!-- Slider: DTI -->
-          <div class="space-y-1.5 bg-slate-50 p-4 rounded-lg border border-slate-200">
-            <div class="flex justify-between items-center text-xs">
-              <span class="font-semibold text-slate-700">Debt-to-Income (Fixed Monthly EMI / Income Ratio)</span>
-              <span id="val-dti" class="font-mono font-bold text-sm text-blue-800 bg-blue-100/70 px-2.5 py-0.5 rounded border border-blue-200">18%</span>
-            </div>
-            <input type="range" id="in-dti" min="5" max="75" value="18" class="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-blue-700">
-            <div class="flex justify-between text-[10px] text-slate-500 font-mono pt-1">
-              <span>5% (Low EMI Burden)</span>
-              <span>36% (Standard Underwriting Cap)</span>
-              <span>50%+ (High Default Probability)</span>
-            </div>
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-2xs space-y-5">
+          <div>
+            <span class="text-xs font-bold text-blue-700 uppercase tracking-wider block">Enterprise Cloud Footprint</span>
+            <h3 class="text-lg font-bold text-slate-900 mt-0.5">Microsoft Azure Native Architecture</h3>
+            <p class="text-xs text-slate-500">Every resource is declared as Infrastructure as Code via Bicep (<code class="font-mono text-blue-700">infra/main.bicep</code>).</p>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
-            <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Delinquent EMIs (2 Yrs)</label>
-              <select id="in-delinq" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-mono text-xs focus:bg-white focus:border-blue-700 focus:outline-none">
-                <option value="0">0 Late Payments</option>
-                <option value="1">1 EMI Missed (30+ Days)</option>
-                <option value="2">2 EMIs Missed</option>
-                <option value="3">3+ EMIs Missed</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Contract Interest APR (%)</label>
-              <input type="number" id="in-rate" value="8.5" step="0.25" min="6.0" max="32.0" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-mono text-xs focus:bg-white focus:border-blue-700 focus:outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1">Work Experience (Yrs)</label>
-              <input type="number" id="in-emp" value="8" step="1" min="0" max="40" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-mono text-xs focus:bg-white focus:border-blue-700 focus:outline-none">
-            </div>
-          </div>
-        </div>
-
-        <!-- Decision & Explainability Column (5 Cols) -->
-        <div class="lg:col-span-5 space-y-6">
-
-          <!-- Decision Card -->
-          <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-2xs flex flex-col items-center text-center">
-            
-            <div id="decision-banner" class="w-full py-3 px-4 rounded-lg font-bold text-xs tracking-wider uppercase mb-5 flex items-center justify-center space-x-2 bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs">
-              <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-700"></i>
-              <span id="decision-text">UNDERWRITING: APPROVED (Prime Tier)</span>
-            </div>
-
-            <!-- Light Mode SVG Radial Gauge -->
-            <div class="relative w-44 h-44 flex items-center justify-center">
-              <svg class="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
-                <circle cx="60" cy="60" r="50" stroke="#e2e8f0" stroke-width="9" fill="transparent"/>
-                <circle id="gauge-bar" cx="60" cy="60" r="50" stroke="#059669" stroke-width="9" stroke-linecap="round" fill="transparent" stroke-dasharray="314.159" stroke-dashoffset="305" class="gauge-circle"/>
-              </svg>
-              <div class="absolute flex flex-col items-center justify-center">
-                <span id="gauge-value" class="text-3xl font-extrabold font-mono text-slate-900">2.4%</span>
-                <span class="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mt-0.5">Default Risk</span>
+            <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
+              <div class="flex items-center space-x-2 text-blue-800 font-bold text-sm">
+                <i data-lucide="database" class="w-4 h-4 text-blue-700"></i>
+                <span>Azure Data Lake Storage (ADLS)</span>
               </div>
+              <p class="text-xs text-slate-600">Hierarchical namespace enabled for Delta Lake Lakehouse. Separates raw immutable applications from curated feature assets.</p>
             </div>
 
-            <p id="decision-sub" class="text-xs text-slate-600 mt-4 leading-relaxed">
-              Calibrated default probability is well within the institutional ceiling of <strong class="text-slate-900">35.0%</strong>.
-            </p>
-          </div>
-
-          <!-- Formal Adverse Action Notice (RBI Fair Practices Code & ECOA) -->
-          <div id="adverse-card" class="bg-rose-50/60 border border-rose-200 rounded-xl p-5 shadow-2xs hidden">
-            <div class="flex items-start space-x-3">
-              <div class="p-2 rounded-lg bg-rose-100 text-rose-800 mt-0.5">
-                <i data-lucide="alert-octagon" class="w-5 h-5"></i>
+            <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
+              <div class="flex items-center space-x-2 text-indigo-800 font-bold text-sm">
+                <i data-lucide="cpu" class="w-4 h-4 text-indigo-700"></i>
+                <span>Azure ML v2 Pipeline</span>
               </div>
-              <div class="space-y-2 flex-1">
-                <div class="flex items-center justify-between">
-                  <h4 class="text-xs font-bold uppercase tracking-wider text-rose-900">Mandated Adverse Action Statement</h4>
-                  <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-200/60 text-rose-800 font-semibold">RBI Fair Lending Guidelines</span>
-                </div>
-                <p class="text-xs text-slate-600 leading-relaxed">
-                  Under the Fair Credit Practices Code, the applicant is hereby provided the key adverse factors for loan declination:
-                </p>
-                <div id="adverse-list" class="space-y-2 pt-1 text-xs">
-                  <!-- Dynamically populated -->
-                </div>
+              <p class="text-xs text-slate-600">Automates data contract validation, financial ratio engineering, GBDT model training, and 3-fold probability calibration.</p>
+            </div>
+
+            <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
+              <div class="flex items-center space-x-2 text-emerald-800 font-bold text-sm">
+                <i data-lucide="zap" class="w-4 h-4 text-emerald-700"></i>
+                <span>Zero-Idle Cost Compute</span>
               </div>
+              <p class="text-xs text-slate-600">Configured with <code class="font-mono text-emerald-800">minNodeCount: 0</code>. Auto-scales down after 120s of inactivity to ensure $0 idle compute charges.</p>
             </div>
           </div>
 
-          <!-- Engineered Feature Indicators -->
-          <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs">
-            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-3">Model Transformed Financial Signals</span>
-            <div class="grid grid-cols-3 gap-3 text-center">
-              <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                <span class="text-[10px] text-slate-500 block font-medium">Revolving Stress</span>
-                <span id="sig-stress" class="text-sm font-bold font-mono text-slate-900 mt-0.5 block">0.08</span>
-              </div>
-              <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                <span class="text-[10px] text-slate-500 block font-medium">Monthly EMI Burden</span>
-                <span id="sig-burden" class="text-sm font-bold font-mono text-slate-900 mt-0.5 block">4.4%</span>
-              </div>
-              <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                <span class="text-[10px] text-slate-500 block font-medium">Income / Loan</span>
-                <span id="sig-ratio" class="text-sm font-bold font-mono text-slate-900 mt-0.5 block">4.5x</span>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- ==================== TAB 3: MODEL BENCHMARKS ==================== -->
-    <div id="tab-benchmarks" class="tab-content hidden space-y-6">
-      
-      <!-- Breadcrumb Bar -->
-      <div class="flex items-center justify-between">
-        <button onclick="switchTab('tab-home')" class="text-xs font-semibold text-blue-700 hover:text-blue-900 flex items-center space-x-1">
-          <i data-lucide="chevron-left" class="w-4 h-4"></i>
-          <span>Back to Portal Home</span>
-        </button>
-        <span class="text-xs text-slate-500 font-mono">Statistical Audit Metrics</span>
-      </div>
-
-      <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-2xs space-y-5">
-        <div>
-          <span class="text-xs font-bold text-blue-700 uppercase tracking-wider block">Audited Test Performance</span>
-          <h3 class="text-lg font-bold text-slate-900 mt-0.5">Financial Regulatory Model Benchmark</h3>
-          <p class="text-xs text-slate-500">Evaluated on a strictly held-out 20% test partition (2,000 credit applications).</p>
-        </div>
-
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
-            <span class="text-xs text-slate-500 font-medium block">ROC-AUC</span>
-            <span class="text-2xl font-extrabold font-mono text-slate-900 mt-1 block">0.8716</span>
-            <span class="text-[11px] text-emerald-700 font-semibold mt-1 block">Target: &ge; 0.75</span>
-          </div>
-
-          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
-            <span class="text-xs text-slate-500 font-medium block">Gini Coefficient</span>
-            <span class="text-2xl font-extrabold font-mono text-slate-900 mt-1 block">0.7432</span>
-            <span class="text-[11px] text-emerald-700 font-semibold mt-1 block">Basel III / Risk Committee Std</span>
-          </div>
-
-          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
-            <span class="text-xs text-slate-500 font-medium block">PR-AUC (Avg Precision)</span>
-            <span class="text-2xl font-extrabold font-mono text-slate-900 mt-1 block">0.6158</span>
-            <span class="text-[11px] text-emerald-700 font-semibold mt-1 block">4x over base default rate</span>
-          </div>
-
-          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
-            <span class="text-xs text-slate-500 font-medium block">Brier Score Loss</span>
-            <span class="text-2xl font-extrabold font-mono text-slate-900 mt-1 block">0.0878</span>
-            <span class="text-[11px] text-emerald-700 font-semibold mt-1 block">3-Fold Sigmoid Calibrated</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Feature Importances -->
-      <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-2xs space-y-4">
-        <h4 class="text-sm font-bold text-slate-900">Global Feature Attribution Breakdown</h4>
-        <p class="text-xs text-slate-500">Relative contribution to credit default risk probability according to Gradient Boosted Decision Trees:</p>
-
-        <div class="space-y-3.5 font-mono text-xs pt-2">
-          <div>
-            <div class="flex justify-between text-slate-700 mb-1">
-              <span>credit_score (CIBIL / FICO Score)</span>
-              <span class="font-bold text-blue-900">32.6%</span>
-            </div>
-            <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-              <div class="bg-blue-700 h-full rounded-full" style="width: 32.6%"></div>
-            </div>
-          </div>
-          <div>
-            <div class="flex justify-between text-slate-700 mb-1">
-              <span>revolving_stress (Credit Utilization &times; Score Deficit)</span>
-              <span class="font-bold text-blue-900">24.2%</span>
-            </div>
-            <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-              <div class="bg-blue-700 h-full rounded-full" style="width: 24.2%"></div>
-            </div>
-          </div>
-          <div>
-            <div class="flex justify-between text-slate-700 mb-1">
-              <span>debt_to_income (Monthly EMI to Income)</span>
-              <span class="font-bold text-blue-900">9.8%</span>
-            </div>
-            <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-              <div class="bg-blue-700 h-full rounded-full" style="width: 9.8%"></div>
-            </div>
-          </div>
-          <div>
-            <div class="flex justify-between text-slate-700 mb-1">
-              <span>delinquency_severity (Late Payments &times; DTI)</span>
-              <span class="font-bold text-blue-900">8.8%</span>
-            </div>
-            <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-              <div class="bg-blue-700 h-full rounded-full" style="width: 8.8%"></div>
-            </div>
-          </div>
-          <div>
-            <div class="flex justify-between text-slate-700 mb-1">
-              <span>interest_rate APR</span>
-              <span class="font-bold text-blue-900">8.3%</span>
-            </div>
-            <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-              <div class="bg-blue-700 h-full rounded-full" style="width: 8.3%"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- ==================== TAB 4: AZURE CLOUD ARCHITECTURE ==================== -->
-    <div id="tab-azure" class="tab-content hidden space-y-6">
-      
-      <!-- Breadcrumb Bar -->
-      <div class="flex items-center justify-between">
-        <button onclick="switchTab('tab-home')" class="text-xs font-semibold text-blue-700 hover:text-blue-900 flex items-center space-x-1">
-          <i data-lucide="chevron-left" class="w-4 h-4"></i>
-          <span>Back to Portal Home</span>
-        </button>
-        <span class="text-xs text-slate-500 font-mono">Cloud Infrastructure as Code</span>
-      </div>
-
-      <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-2xs space-y-5">
-        <div>
-          <span class="text-xs font-bold text-blue-700 uppercase tracking-wider block">Enterprise Cloud Footprint</span>
-          <h3 class="text-lg font-bold text-slate-900 mt-0.5">Microsoft Azure Native Architecture</h3>
-          <p class="text-xs text-slate-500">Every resource is declared as Infrastructure as Code via Bicep (<code class="font-mono text-blue-700">infra/main.bicep</code>).</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
-          <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
-            <div class="flex items-center space-x-2 text-blue-800 font-bold text-sm">
-              <i data-lucide="database" class="w-4 h-4 text-blue-700"></i>
-              <span>Azure Data Lake Storage (ADLS)</span>
-            </div>
-            <p class="text-xs text-slate-600">Hierarchical namespace enabled for Delta Lake Lakehouse. Separates raw immutable applications from curated feature assets.</p>
-          </div>
-
-          <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
-            <div class="flex items-center space-x-2 text-indigo-800 font-bold text-sm">
-              <i data-lucide="cpu" class="w-4 h-4 text-indigo-700"></i>
-              <span>Azure ML v2 Pipeline</span>
-            </div>
-            <p class="text-xs text-slate-600">Automates data contract validation, financial ratio engineering, GBDT model training, and 3-fold probability calibration.</p>
-          </div>
-
-          <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
-            <div class="flex items-center space-x-2 text-emerald-800 font-bold text-sm">
-              <i data-lucide="zap" class="w-4 h-4 text-emerald-700"></i>
-              <span>Zero-Idle Cost Compute</span>
-            </div>
-            <p class="text-xs text-slate-600">Configured with <code class="font-mono text-emerald-800">minNodeCount: 0</code>. Auto-scales down after 120s of inactivity to ensure $0 idle compute charges.</p>
-          </div>
-        </div>
-
-        <div class="pt-3">
-          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Automated Azure Deployment Commands</h4>
-          <pre class="bg-slate-900 text-blue-300 p-4 rounded-lg font-mono text-xs overflow-x-auto shadow-inner"><code># 1. Create Azure Resource Group
+          <div class="pt-3">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Automated Azure Deployment Commands</h4>
+            <pre class="bg-slate-900 text-blue-300 p-4 rounded-lg font-mono text-xs overflow-x-auto shadow-inner"><code># 1. Create Azure Resource Group
 az group create --name rg-finshield-prod --location centralindia
 
 # 2. Deploy Infrastructure via Bicep
@@ -701,19 +746,19 @@ az deployment group create --resource-group rg-finshield-prod --template-file in
 
 # 3. Trigger Azure ML Training Pipeline Job
 az ml job create --file pipelines/pipeline_job.yaml --resource-group rg-finshield-prod</code></pre>
+          </div>
         </div>
       </div>
-    </div>
 
-  </main>
+    </main>
 
-  <!-- Bank Footer -->
-  <footer class="bg-white border-t border-slate-200 py-5 text-center text-xs text-slate-500">
-    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-2">
+    <!-- Footer -->
+    <footer class="bg-white/80 border-t border-slate-200 py-4 px-6 text-center text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2 mt-auto">
       <div>FinShield Institutional Risk Advisory Platform &bull; Certified for RBI Digital Lending & Fair Practices Guidelines</div>
-      <div class="font-mono text-[11px] text-slate-400">Microsoft Azure ML Architecture &bull; Central India Region Compatible</div>
-    </div>
-  </footer>
+      <div class="font-mono text-[11px] text-slate-400">Microsoft Azure ML &bull; All Loans Protected Under Autonomous Governance</div>
+    </footer>
+
+  </div>
 
   <script>
     // Initialize Lucide Icons
@@ -734,20 +779,21 @@ az ml job create --file pipelines/pipeline_job.yaml --resource-group rg-finshiel
       }
     }
 
-    // Tab Switching Logic
+    // Tab Switching Logic (Sidebar Synchronized)
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('border-blue-700', 'text-blue-800', 'font-semibold');
-        btn.classList.add('border-transparent', 'text-slate-500', 'font-medium');
+      document.querySelectorAll('.sidebar-btn').forEach(btn => {
+        btn.className = "sidebar-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-slate-100 hover:text-slate-900";
       });
 
-      document.getElementById(tabId).classList.remove('hidden');
+      const target = document.getElementById(tabId);
+      if (target) target.classList.remove('hidden');
+
       const activeBtn = document.getElementById('btn-' + tabId);
       if (activeBtn) {
-        activeBtn.classList.add('border-blue-700', 'text-blue-800', 'font-semibold');
-        activeBtn.classList.remove('border-transparent', 'text-slate-500', 'font-medium');
+        activeBtn.className = "sidebar-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-semibold transition bg-blue-50 text-blue-900 border border-blue-200/80 shadow-2xs";
       }
+
       lucide.createIcons();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -779,7 +825,7 @@ az ml job create --file pipelines/pipeline_job.yaml --resource-group rg-finshiel
       let income, loan, score, dti, util, delinq;
 
       if (!isSubprime) {
-        // Prime / Normal: INR 6 Lakhs to 25 Lakhs income, Loan 1.5 Lakhs to 8 Lakhs
+        // Prime
         income = Math.floor(600000 + Math.random() * 1900000);
         loan = Math.floor(150000 + Math.random() * 650000);
         score = Math.floor(680 + Math.random() * 140);
@@ -787,7 +833,7 @@ az ml job create --file pipelines/pipeline_job.yaml --resource-group rg-finshiel
         util = (0.08 + Math.random() * 0.30).toFixed(2);
         delinq = 0;
       } else {
-        // Subprime / High risk: INR 2.5 Lakhs to 4.5 Lakhs income, Loan 4 Lakhs to 9 Lakhs
+        // Subprime
         income = Math.floor(250000 + Math.random() * 200000);
         loan = Math.floor(350000 + Math.random() * 550000);
         score = Math.floor(490 + Math.random() * 130);
@@ -825,7 +871,7 @@ az ml job create --file pipelines/pipeline_job.yaml --resource-group rg-finshiel
         else reason = `Monthly EMI obligation exceeds limit (${(dti*100).toFixed(0)}% DTI)`;
       }
 
-      // Add Row to Table
+      // Add Row
       const tr = document.createElement('tr');
       tr.className = approved ? 'hover:bg-slate-50 transition' : 'bg-rose-50/40 hover:bg-rose-50 transition';
       tr.innerHTML = `
@@ -879,7 +925,6 @@ az ml job create --file pipelines/pipeline_job.yaml --resource-group rg-finshiel
       }, 2000);
     }
 
-    // Seed Initial Stream Rows
     for (let i = 0; i < 7; i++) {
       generateSimulatedApplication();
     }
