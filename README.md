@@ -79,15 +79,18 @@ Evaluated on a strictly held-out $20\%$ test partition ($2,000$ credit applicati
 
 ---
 
-## 💻 Web Application Features
+## 💻 Enterprise Web Application Modules
 
-The production web interface (`index.html`) is designed with an institutional, light-mode central banking aesthetic featuring:
-* **Portal Home Navigation:** Dual-entry routing between High-Velocity Live Streaming and Custom Underwriting.
-* **0.5s High-Velocity Ingestion Terminal:** Continuous application generation in authentic Indian Rupee (₹ INR) salary and loan amounts with configurable speed controls (0.5s, 1.0s, 2.0s).
-* **Interactive Custom Underwriter:** Live sliders for CIBIL score, DTI %, and utilization with one-click audit presets (Prime Approval, Subprime Decline, Borderline).
-* **One-Click Official RBI Credit Sanction / Adverse Action Memo:** Instant generation of formal, watermarked credit decision memorandums with printable PDF capabilities and cryptographic decision hashes.
-* **What-If Sensitivity & Credit Health Optimizer:** Real-time credit repair simulation modeling the exact debt payoff or income increase needed to flip declined loans to prime approval.
-* **Live CSV Audit Export:** One-click download of all streaming transactions for regulatory compliance inspections.
+The production web interface (`index.html`) is engineered with an institutional central banking aesthetic (RBI architectural watermark, left sidebar navigation, and INR ₹ currency standard):
+
+1. **Multi-Bank Lending Institution Risk Policy Selector:** Dynamically switch underwriting mandates between **HDFC Bank** (28% risk ceiling, conservative prime), **State Bank of India (SBI)** (35% risk ceiling, mass retail), **ICICI & Axis Bank** (38% risk ceiling, agile retail), and **Digital NBFC Tier** (45% risk ceiling, dynamic risk-based pricing).
+2. **0.5s High-Velocity Ingestion Terminal:** Continuous streaming application evaluation processing 120 applications/min with sub-millisecond (0.48 ms) scoring latency and one-click CSV audit export.
+3. **Interactive Custom Underwriter with Visual TreeSHAP Waterfall:** Real-time financial slider evaluation decomposed through a local feature attribution waterfall (CIBIL impact, revolving stress impact, DTI impact, delinquency penalty).
+4. **Official RBI Credit Sanction / Adverse Action Memo Generator:** 1-click generation of formal, watermarked credit decision memorandums downloadable as PDF or Word (.doc) files with cryptographic SHA-256 decision hashes.
+5. **What-If Sensitivity & Credit Health Optimizer:** Dynamic simulation calculating the exact debt payoff or income augmentation needed to turn declined applications into approved prime loans.
+6. **Enterprise Batch Credit Underwriter (CSV):** Drag-and-drop batch file uploader evaluating 30+ applications simultaneously with executive portfolio capital summaries (Total Capital, Approval Rate, Expected Loss $EL$) and CSV export.
+7. **Basel III & RBI Macroeconomic Stress-Testing Simulator:** Real-time simulation of portfolio credit losses and Common Equity Tier 1 (CET1) capital adequacy under Baseline, Stagflation (+150 bps rate shock), and Crisis (+300 bps liquidity contraction) scenarios.
+8. **FinTech Developer API Playground:** Interactive REST API tester for `/api/score` with live JSON request/response inspection and ready-to-use client code snippets in cURL, Python (requests), and JavaScript (fetch).
 
 ---
 
