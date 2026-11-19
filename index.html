@@ -35,232 +35,9 @@
         }
       }
     }
-
-    // ==========================================================
-    // EXPORT LIVE STREAM AUDIT TRAIL (.CSV)
-    // ==========================================================
-    function exportLiveStreamCSV() {
-      const rows = document.querySelectorAll('#stream-tbody tr');
-      if (!rows.length) {
-        alert('No live stream records available to export.');
-        return;
-      }
-
-      let csv = 'Timestamp,Application_ID,Annual_Income,Loan_Amount,CIBIL_Score,DTI_Ratio,Calibrated_Risk,Decision,Adverse_Action_Reason\n';
-      rows.forEach(tr => {
-        const cols = tr.querySelectorAll('td');
-        if (cols.length >= 9) {
-          const rowData = Array.from(cols).map(td => {
-            let text = td.textContent.trim().replace(/"/g, '""');
-            return `"${text}"`;
-          });
-          csv += rowData.join(',') + '\n';
-        }
-      });
-
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-      link.setAttribute('href', url);
-      link.setAttribute('download', `FinShield_Live_Audit_Trail_${timestamp}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    // ==========================================================
-    // OFFICIAL SANCTION / ADVERSE ACTION DOCUMENT MODAL
-    // ==========================================================
-    const docModal = document.getElementById('doc-modal');
-    const docRefId = document.getElementById('doc-ref-id');
-    const docDate = document.getElementById('doc-date');
-    const docBadgeStatus = document.getElementById('doc-badge-status');
-    const docTitle = document.getElementById('doc-title');
-    const docSubtitle = document.getElementById('doc-subtitle');
-    const docIncome = document.getElementById('doc-income');
-    const docLoan = document.getElementById('doc-loan');
-    const docScore = document.getElementById('doc-score');
-    const docDti = document.getElementById('doc-dti');
-    const docUtil = document.getElementById('doc-util');
-    const docDelinq = document.getElementById('doc-delinq');
-    const docBodySection = document.getElementById('doc-body-section');
-    const docHash = document.getElementById('doc-hash');
-    const btnLetterLabel = document.getElementById('btn-letter-label');
-
-    function openDocumentModal() {
-      const income = parseFloat(inIncome.value) || 600000;
-      const loan = parseFloat(inLoan.value) || 200000;
-      const score = parseFloat(inScore.value) || 680;
-      const util = parseFloat(inUtil.value) || 12;
-      const dti = parseFloat(inDti.value) || 18;
-      const delinq = parseInt(inDelinq.value) || 0;
-      const rate = parseFloat(inRate.value) || 10.5;
-
-      const randomHash = '0x' + Array.from({length: 16}, () => Math.floor(Math.random()*16).toString(16)).join('');
-      const randomRef = 'REF-RBI-' + Math.floor(100000 + Math.random() * 900000);
-      const todayStr = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-
-      docRefId.textContent = randomRef;
-      docDate.textContent = `Date: ${todayStr}`;
-      docIncome.textContent = formatINR(income);
-      docLoan.textContent = formatINR(loan);
-      docScore.textContent = score;
-      docDti.textContent = `${dti}%`;
-      docUtil.textContent = `${util}%`;
-      docDelinq.textContent = `${delinq} Incident(s)`;
-      docHash.textContent = randomHash;
-
-      // Check current decision state
-      const isApproved = decisionText.textContent.includes('APPROVED');
-
-      if (isApproved) {
-        docBadgeStatus.className = "inline-block px-2.5 py-1 rounded text-xs font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200";
-        docBadgeStatus.textContent = "SANCTIONED & APPROVED";
-        docTitle.textContent = "CREDIT SANCTION & TERMS OF APPROVAL MEMORANDUM";
-        docSubtitle.textContent = "Issued pursuant to RBI Master Directions on Digital Lending & Fair Practices Code";
-
-        const monthlyRate = (rate / 100) / 12;
-        const emi = Math.round((loan * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -36)));
-
-        docBodySection.innerHTML = `
-          <div class="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200 space-y-2">
-            <h5 class="font-bold text-emerald-950 uppercase text-[11px] tracking-wider">Sanction Terms & Commercial Facility</h5>
-            <div class="grid grid-cols-3 gap-3 text-xs pt-1">
-              <div>
-                <span class="text-slate-500 block text-[10px]">Sanctioned Facility:</span>
-                <span class="font-mono font-bold text-slate-900">${formatINR(loan)}</span>
-              </div>
-              <div>
-                <span class="text-slate-500 block text-[10px]">Approved APR:</span>
-                <span class="font-mono font-bold text-slate-900">${rate.toFixed(2)}% p.a.</span>
-              </div>
-              <div>
-                <span class="text-slate-500 block text-[10px]">Estimated Monthly EMI:</span>
-                <span class="font-mono font-bold text-emerald-800">${formatINR(emi)} / mo</span>
-              </div>
-            </div>
-          </div>
-          <p class="text-slate-600 leading-relaxed text-xs">
-            We are pleased to inform you that following autonomous quantitative risk assessment by FinShield, your credit facility application has been sanctioned under the Prime Lending Framework. The applicant maintains an exceptional CIBIL profile (${score}) with a conservative debt-to-income metric (${dti}%).
-          </p>
-          <div class="text-[11px] text-slate-500 border-l-2 border-emerald-500 pl-3 italic">
-            This sanction is subject to standard KYC verification in accordance with RBI Master Direction - Know Your Customer (KYC) Direction, 2016.
-          </div>
-        `;
-      } else {
-        docBadgeStatus.className = "inline-block px-2.5 py-1 rounded text-xs font-bold uppercase bg-rose-100 text-rose-800 border border-rose-200";
-        docBadgeStatus.textContent = "DECLINED (SUBPRIME)";
-        docTitle.textContent = "MANDATED ADVERSE ACTION STATEMENT & STATUTORY DISCLOSURE";
-        docSubtitle.textContent = "Issued in strict compliance with Section 28(a) of the RBI Fair Practices Code";
-
-        let adverseHtml = '';
-        const items = adverseList.querySelectorAll('div');
-        items.forEach((item, idx) => {
-          adverseHtml += `<li class="text-slate-700 font-medium">${item.innerText}</li>`;
-        });
-
-        docBodySection.innerHTML = `
-          <div class="p-4 rounded-xl bg-rose-50/60 border border-rose-200 space-y-2">
-            <h5 class="font-bold text-rose-950 uppercase text-[11px] tracking-wider">Key Principal Reasons for Declination</h5>
-            <ol class="list-decimal pl-4 space-y-1.5 text-xs pt-1">
-              ${adverseHtml || '<li class="text-slate-700">Financial burden and debt obligations exceed prudent underwriting ceilings.</li>'}
-            </ol>
-          </div>
-          <p class="text-slate-600 leading-relaxed text-xs">
-            In accordance with regulatory mandates, you are notified that our autonomous credit model was unable to approve your application at this time based upon the risk parameters cited above.
-          </p>
-          <div class="text-[11px] text-slate-500 border-l-2 border-rose-500 pl-3 italic">
-            Credit Information Bureau Disclosure: Your credit history was obtained from TransUnion CIBIL / Experian India. Under the Credit Information Companies (Regulation) Act, 2005, you have the right to request a free disclosure copy from the respective bureau.
-          </div>
-        `;
-      }
-
-      docModal.classList.remove('hidden');
-      lucide.createIcons();
-    }
-
-    function closeDocumentModal() {
-      docModal.classList.add('hidden');
-    }
-
-    // ==========================================================
-    // WHAT-IF SENSITIVITY & CREDIT HEALTH OPTIMIZER
-    // ==========================================================
-    const whatifSliderUtil = document.getElementById('whatif-slider-util');
-    const whatifSliderIncome = document.getElementById('whatif-slider-income');
-    const whatifValUtil = document.getElementById('whatif-val-util');
-    const whatifValIncome = document.getElementById('whatif-val-income');
-    const whatifRiskDisplay = document.getElementById('whatif-risk-display');
-    const whatifDeltaDisplay = document.getElementById('whatif-delta-display');
-    const whatifStatusBadge = document.getElementById('whatif-status-badge');
-
-    function updateWhatIfSimulator() {
-      const deltaUtil = parseFloat(whatifSliderUtil.value) || 0;
-      const deltaIncome = parseFloat(whatifSliderIncome.value) || 0;
-
-      whatifValUtil.textContent = deltaUtil > 0 ? `-${deltaUtil}%` : `-0%`;
-      whatifValIncome.textContent = deltaIncome > 0 ? `+${formatINR(deltaIncome)}` : `+₹0`;
-
-      // Baseline values
-      const income = (parseFloat(inIncome.value) || 600000) + deltaIncome;
-      const loan = parseFloat(inLoan.value) || 200000;
-      const score = parseFloat(inScore.value) || 680;
-      const baseUtil = parseFloat(inUtil.value) || 30;
-      const util = Math.max(0.01, (baseUtil - deltaUtil) / 100.0);
-      const dti = parseFloat(inDti.value) / 100.0;
-      const delinq = parseInt(inDelinq.value) || 0;
-      const rate = parseFloat(inRate.value) || 10.0;
-      const emp = parseFloat(inEmp.value) || 4;
-
-      const income_to_loan = income / Math.max(loan, 1);
-      const credit_deficit = Math.max(0, 850 - score) / 100.0;
-      const revolving_stress = util * credit_deficit;
-      const delinquency_severity = delinq * (1.0 + dti);
-
-      let z = -2.85;
-      z += 4.5 * (dti - 0.28);
-      z += 3.8 * (revolving_stress - 0.45);
-      z -= 0.015 * (score - 670);
-      z += 0.65 * delinquency_severity;
-      z += 0.08 * (rate - 11.5);
-      z -= 0.035 * emp;
-      if (income_to_loan < 2.5) z += 0.45 * (2.5 - income_to_loan);
-
-      let prob = 1.0 / (1.0 + Math.exp(-z));
-      prob = Math.min(0.999, Math.max(0.005, prob));
-      const probPct = (prob * 100).toFixed(1);
-
-      whatifRiskDisplay.textContent = `${probPct}%`;
-
-      const baselineProb = parseFloat(gaugeValue.textContent) || 2.4;
-      const delta = (prob * 100) - baselineProb;
-      if (Math.abs(delta) < 0.1) {
-        whatifDeltaDisplay.textContent = '(Baseline)';
-        whatifDeltaDisplay.className = 'font-mono text-[11px] text-slate-500 font-semibold';
-      } else if (delta < 0) {
-        whatifDeltaDisplay.textContent = `(${delta.toFixed(1)}% Risk Reduced)`;
-        whatifDeltaDisplay.className = 'font-mono text-[11px] text-emerald-600 font-semibold';
-      } else {
-        whatifDeltaDisplay.textContent = `(+${delta.toFixed(1)}% Risk Increased)`;
-        whatifDeltaDisplay.className = 'font-mono text-[11px] text-rose-600 font-semibold';
-      }
-
-      if (prob < 0.35) {
-        whatifStatusBadge.className = "px-2.5 py-1 rounded font-bold text-[11px] bg-emerald-100 text-emerald-800 border border-emerald-200";
-        whatifStatusBadge.textContent = "APPROVED";
-      } else {
-        whatifStatusBadge.className = "px-2.5 py-1 rounded font-bold text-[11px] bg-rose-100 text-rose-800 border border-rose-200";
-        whatifStatusBadge.textContent = "DECLINED";
-      }
-    }
-
-    if (whatifSliderUtil && whatifSliderIncome) {
-      whatifSliderUtil.addEventListener('input', updateWhatIfSimulator);
-      whatifSliderIncome.addEventListener('input', updateWhatIfSimulator);
-    }
-
   </script>
+  <!-- html2pdf for direct PDF file download -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     .gauge-circle {
       transition: stroke-dashoffset 0.8s ease-in-out, stroke 0.4s ease;
@@ -283,6 +60,33 @@
       background-position: center right;
       background-repeat: no-repeat;
       background-size: 850px;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden !important;
+      }
+      #doc-modal, #printable-doc, #printable-doc * {
+        visibility: visible !important;
+      }
+      #doc-modal {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        background: white !important;
+        padding: 0 !important;
+        display: block !important;
+      }
+      #printable-doc {
+        width: 100% !important;
+        padding: 20px !important;
+        margin: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
     }
   </style>
 </head>
@@ -790,11 +594,17 @@
                 Calibrated default probability is well within the institutional ceiling of <strong class="text-slate-900">35.0%</strong>.
               </p>
 
-              <!-- One-Click Official Sanction / Adverse Action Letter Button -->
-              <button id="btn-download-letter" onclick="openDocumentModal()" class="w-full mt-4 py-2.5 px-4 rounded-xl font-bold text-xs shadow-2xs flex items-center justify-center space-x-2 transition border bg-blue-800 hover:bg-blue-900 text-white">
-                <i data-lucide="file-check" class="w-4 h-4"></i>
-                <span id="btn-letter-label">Generate Official RBI Sanction Letter (PDF)</span>
-              </button>
+              <!-- Official Sanction / Adverse Action Letter Actions -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4">
+                <button id="btn-download-pdf-direct" onclick="downloadLetterPDF()" class="py-2.5 px-3 rounded-xl font-bold text-xs shadow-2xs flex items-center justify-center space-x-1.5 transition border bg-emerald-700 hover:bg-emerald-800 text-white">
+                  <i data-lucide="download" class="w-4 h-4"></i>
+                  <span id="btn-direct-download-label">Download Letter (.PDF)</span>
+                </button>
+                <button onclick="openDocumentModal()" class="py-2.5 px-3 rounded-xl font-bold text-xs shadow-2xs flex items-center justify-center space-x-1.5 transition border border-slate-300 bg-white hover:bg-slate-50 text-slate-700">
+                  <i data-lucide="eye" class="w-4 h-4 text-blue-700"></i>
+                  <span>Preview &amp; Print</span>
+                </button>
+              </div>
             </div>
 
             <!-- Adverse Action Notice -->
@@ -1208,6 +1018,112 @@
 
   </div>
 
+    <!-- ==================== OFFICIAL SANCTION / ADVERSE ACTION LETTER MODAL ==================== -->
+  <div id="doc-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
+      
+      <!-- Modal Header (Non-printing controls) -->
+      <div class="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between no-print">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="award" class="w-5 h-5 text-blue-800"></i>
+          <span class="text-xs font-bold text-slate-800 uppercase tracking-wider">Official Credit Memorandum</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="downloadLetterPDF()" class="px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center space-x-1.5 shadow-2xs transition">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span>Download PDF</span>
+          </button>
+          <button onclick="downloadLetterDOC()" class="px-2.5 py-1.5 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 text-xs font-bold flex items-center space-x-1 shadow-2xs transition">
+            <i data-lucide="file-text" class="w-3.5 h-3.5 text-blue-800"></i>
+            <span>Word (.doc)</span>
+          </button>
+          <button onclick="window.print()" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center space-x-1 transition">
+            <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+            <span>Print</span>
+          </button>
+          <button onclick="closeDocumentModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Printable Document Container -->
+      <div id="printable-doc" class="p-8 overflow-y-auto space-y-6 text-slate-800 font-sans text-xs bg-white">
+        
+        <!-- Letterhead -->
+        <div class="flex items-start justify-between border-b-2 border-slate-900 pb-5">
+          <div class="space-y-1">
+            <div class="flex items-center space-x-2">
+              <span class="text-xl font-black text-blue-950 tracking-tight font-serif">FinShield Bank</span>
+              <span class="px-1.5 py-0.5 rounded bg-blue-100 text-blue-900 text-[10px] font-bold">RBI Regulated NBFC-ICC</span>
+            </div>
+            <p class="text-[11px] text-slate-500">Institutional Credit Underwriting &amp; Risk Advisory Department</p>
+            <p class="text-[10px] text-slate-400">Head Office: FinShield Tower, Bandra Kurla Complex (BKC), Mumbai 400051</p>
+          </div>
+          <div class="text-right space-y-1 font-mono text-[11px]">
+            <p class="font-bold text-slate-900" id="doc-ref-id">REF: FIN/2026/0942</p>
+            <p class="text-slate-500" id="doc-date">Date: 19-Nov-2026</p>
+            <span id="doc-badge-status" class="inline-block px-2.5 py-1 rounded text-xs font-bold uppercase"></span>
+          </div>
+        </div>
+
+        <!-- Title -->
+        <div class="text-center py-2">
+          <h2 id="doc-title" class="text-base font-extrabold text-slate-900 tracking-wide uppercase font-serif"></h2>
+          <p id="doc-subtitle" class="text-[11px] text-slate-500 mt-0.5"></p>
+        </div>
+
+        <!-- Applicant Summary Table -->
+        <div class="space-y-2">
+          <h4 class="text-[11px] font-bold uppercase tracking-wider text-slate-700">Applicant Credit Evaluation Profile</h4>
+          <table class="w-full border-collapse border border-slate-200 text-left text-xs">
+            <tr class="bg-slate-50">
+              <th class="border border-slate-200 p-2 font-semibold text-slate-600">Applicant Annual Income:</th>
+              <td class="border border-slate-200 p-2 font-mono font-bold" id="doc-income">&#8377;18,00,000</td>
+              <th class="border border-slate-200 p-2 font-semibold text-slate-600">Loan Facility Requested:</th>
+              <td class="border border-slate-200 p-2 font-mono font-bold" id="doc-loan">&#8377;4,00,000</td>
+            </tr>
+            <tr>
+              <th class="border border-slate-200 p-2 font-semibold text-slate-600">CIBIL / Credit Bureau Score:</th>
+              <td class="border border-slate-200 p-2 font-mono font-bold" id="doc-score">780</td>
+              <th class="border border-slate-200 p-2 font-semibold text-slate-600">Debt-to-Income (DTI):</th>
+              <td class="border border-slate-200 p-2 font-mono font-bold" id="doc-dti">18%</td>
+            </tr>
+            <tr class="bg-slate-50">
+              <th class="border border-slate-200 p-2 font-semibold text-slate-600">Credit Card Utilization:</th>
+              <td class="border border-slate-200 p-2 font-mono font-bold" id="doc-util">12%</td>
+              <th class="border border-slate-200 p-2 font-semibold text-slate-600">Delinquencies (Past 24m):</th>
+              <td class="border border-slate-200 p-2 font-mono font-bold" id="doc-delinq">0 Incidents</td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- Dynamic Body Content (Sanction Terms OR Adverse Action Disclosures) -->
+        <div id="doc-body-section" class="space-y-3">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Sign-off & Regulatory Hash -->
+        <div class="pt-6 border-t border-slate-200 flex items-end justify-between">
+          <div class="space-y-1">
+            <p class="font-bold text-slate-900">Autonomous Risk Underwriting System (FinShield AI)</p>
+            <p class="text-[10px] text-slate-500">Calibrated GBDT Engine &bull; Validated by Chief Risk Officer (CRO)</p>
+            <p class="text-[10px] font-mono text-slate-400">Cryptographic Decision Hash: <span id="doc-hash">0x8a92f0...4c</span></p>
+          </div>
+          <div class="text-right">
+            <div class="inline-block border-b border-slate-400 pb-1 px-4 mb-1">
+              <span class="font-serif italic text-blue-900 text-sm font-bold">Authorized Signatory</span>
+            </div>
+            <p class="text-[10px] text-slate-500">Credit Risk &amp; Regulatory Compliance</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+
   <script>
     // Initialize Lucide Icons
     lucide.createIcons();
@@ -1556,100 +1472,288 @@
     });
 
     recalculateInteractive();
+  
+    // ==========================================================
+    // EXPORT LIVE STREAM AUDIT TRAIL (.CSV)
+    // ==========================================================
+    function exportLiveStreamCSV() {
+      const rows = document.querySelectorAll('#stream-tbody tr');
+      if (!rows.length) {
+        alert('No live stream records available to export.');
+        return;
+      }
+
+      let csv = 'Timestamp,Application_ID,Annual_Income,Loan_Amount,CIBIL_Score,DTI_Ratio,Calibrated_Risk,Decision,Adverse_Action_Reason\n';
+      rows.forEach(tr => {
+        const cols = tr.querySelectorAll('td');
+        if (cols.length >= 9) {
+          const rowData = Array.from(cols).map(td => {
+            let text = td.textContent.trim().replace(/"/g, '""');
+            return `"${text}"`;
+          });
+          csv += rowData.join(',') + '\n';
+        }
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `FinShield_Live_Audit_Trail_${timestamp}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // ==========================================================
+    // OFFICIAL SANCTION / ADVERSE ACTION LETTER ENGINE
+    // ==========================================================
+    const docModal = document.getElementById('doc-modal');
+    const docRefId = document.getElementById('doc-ref-id');
+    const docDate = document.getElementById('doc-date');
+    const docBadgeStatus = document.getElementById('doc-badge-status');
+    const docTitle = document.getElementById('doc-title');
+    const docSubtitle = document.getElementById('doc-subtitle');
+    const docIncome = document.getElementById('doc-income');
+    const docLoan = document.getElementById('doc-loan');
+    const docScore = document.getElementById('doc-score');
+    const docDti = document.getElementById('doc-dti');
+    const docUtil = document.getElementById('doc-util');
+    const docDelinq = document.getElementById('doc-delinq');
+    const docBodySection = document.getElementById('doc-body-section');
+    const docHash = document.getElementById('doc-hash');
+    const btnDirectDownloadLabel = document.getElementById('btn-direct-download-label');
+
+    function populateDocumentData() {
+      const income = parseFloat(inIncome.value) || 600000;
+      const loan = parseFloat(inLoan.value) || 200000;
+      const score = parseFloat(inScore.value) || 680;
+      const util = parseFloat(inUtil.value) || 12;
+      const dti = parseFloat(inDti.value) || 18;
+      const delinq = parseInt(inDelinq.value) || 0;
+      const rate = parseFloat(inRate.value) || 10.5;
+
+      const randomHash = '0x' + Array.from({length: 16}, () => Math.floor(Math.random()*16).toString(16)).join('');
+      const randomRef = 'REF-RBI-' + Math.floor(100000 + Math.random() * 900000);
+      const todayStr = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+
+      docRefId.textContent = randomRef;
+      docDate.textContent = `Date: ${todayStr}`;
+      docIncome.textContent = formatINR(income);
+      docLoan.textContent = formatINR(loan);
+      docScore.textContent = score;
+      docDti.textContent = `${dti}%`;
+      docUtil.textContent = `${util}%`;
+      docDelinq.textContent = `${delinq} Incident(s)`;
+      docHash.textContent = randomHash;
+
+      const isApproved = decisionText.textContent.includes('APPROVED');
+
+      if (isApproved) {
+        docBadgeStatus.className = "inline-block px-2.5 py-1 rounded text-xs font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200";
+        docBadgeStatus.textContent = "SANCTIONED & APPROVED";
+        docTitle.textContent = "CREDIT SANCTION & TERMS OF APPROVAL MEMORANDUM";
+        docSubtitle.textContent = "Issued pursuant to RBI Master Directions on Digital Lending & Fair Practices Code";
+
+        const monthlyRate = (rate / 100) / 12;
+        const emi = Math.round((loan * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -36)));
+
+        docBodySection.innerHTML = `
+          <div class="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200 space-y-2">
+            <h5 class="font-bold text-emerald-950 uppercase text-[11px] tracking-wider">Sanction Terms & Commercial Facility</h5>
+            <div class="grid grid-cols-3 gap-3 text-xs pt-1">
+              <div>
+                <span class="text-slate-500 block text-[10px]">Sanctioned Facility:</span>
+                <span class="font-mono font-bold text-slate-900">${formatINR(loan)}</span>
+              </div>
+              <div>
+                <span class="text-slate-500 block text-[10px]">Approved APR:</span>
+                <span class="font-mono font-bold text-slate-900">${rate.toFixed(2)}% p.a.</span>
+              </div>
+              <div>
+                <span class="text-slate-500 block text-[10px]">Estimated Monthly EMI:</span>
+                <span class="font-mono font-bold text-emerald-800">${formatINR(emi)} / mo</span>
+              </div>
+            </div>
+          </div>
+          <p class="text-slate-600 leading-relaxed text-xs">
+            We are pleased to inform you that following autonomous quantitative risk assessment by FinShield, your credit facility application has been sanctioned under the Prime Lending Framework. The applicant maintains an exceptional CIBIL profile (${score}) with a conservative debt-to-income metric (${dti}%).
+          </p>
+          <div class="text-[11px] text-slate-500 border-l-2 border-emerald-500 pl-3 italic">
+            This sanction is subject to standard KYC verification in accordance with RBI Master Direction - Know Your Customer (KYC) Direction, 2016.
+          </div>
+        `;
+      } else {
+        docBadgeStatus.className = "inline-block px-2.5 py-1 rounded text-xs font-bold uppercase bg-rose-100 text-rose-800 border border-rose-200";
+        docBadgeStatus.textContent = "DECLINED (SUBPRIME)";
+        docTitle.textContent = "MANDATED ADVERSE ACTION STATEMENT & STATUTORY DISCLOSURE";
+        docSubtitle.textContent = "Issued in strict compliance with Section 28(a) of the RBI Fair Practices Code";
+
+        let adverseHtml = '';
+        const items = adverseList.querySelectorAll('div');
+        items.forEach((item, idx) => {
+          adverseHtml += `<li class="text-slate-700 font-medium">${item.innerText}</li>`;
+        });
+
+        docBodySection.innerHTML = `
+          <div class="p-4 rounded-xl bg-rose-50/60 border border-rose-200 space-y-2">
+            <h5 class="font-bold text-rose-950 uppercase text-[11px] tracking-wider">Key Principal Reasons for Declination</h5>
+            <ol class="list-decimal pl-4 space-y-1.5 text-xs pt-1">
+              ${adverseHtml || '<li class="text-slate-700">Financial burden and debt obligations exceed prudent underwriting ceilings.</li>'}
+            </ol>
+          </div>
+          <p class="text-slate-600 leading-relaxed text-xs">
+            In accordance with regulatory mandates, you are notified that our autonomous credit model was unable to approve your application at this time based upon the risk parameters cited above.
+          </p>
+          <div class="text-[11px] text-slate-500 border-l-2 border-rose-500 pl-3 italic">
+            Credit Information Bureau Disclosure: Your credit history was obtained from TransUnion CIBIL / Experian India. Under the Credit Information Companies (Regulation) Act, 2005, you have the right to request a free disclosure copy from the respective bureau.
+          </div>
+        `;
+      }
+    }
+
+    function openDocumentModal() {
+      populateDocumentData();
+      docModal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeDocumentModal() {
+      docModal.classList.add('hidden');
+    }
+
+    // DIRECT PDF DOWNLOAD FUNCTION
+    function downloadLetterPDF() {
+      populateDocumentData();
+      const isApproved = decisionText.textContent.includes('APPROVED');
+      const filename = isApproved ? 'FinShield_Credit_Sanction_Letter.pdf' : 'FinShield_Adverse_Action_Notice.pdf';
+      const element = document.getElementById('printable-doc');
+
+      if (window.html2pdf) {
+        const opt = {
+          margin:       8,
+          filename:     filename,
+          image:        { type: 'jpeg', quality: 0.98 },
+          html2canvas:  { scale: 2, useCORS: true },
+          jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
+      } else {
+        // Fallback: download formatted Word doc
+        downloadLetterDOC();
+      }
+    }
+
+    // DIRECT WORD (.DOC) DOWNLOAD FUNCTION
+    function downloadLetterDOC() {
+      populateDocumentData();
+      const isApproved = decisionText.textContent.includes('APPROVED');
+      const filename = isApproved ? 'FinShield_Credit_Sanction_Letter.doc' : 'FinShield_Adverse_Action_Notice.doc';
+      const content = document.getElementById('printable-doc').innerHTML;
+
+      const header = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+              xmlns:w='urn:schemas-microsoft-com:office:word' 
+              xmlns='http://www.w3.org/TR/REC-html40'>
+        <head><meta charset='utf-8'><title>${filename}</title>
+        <style>
+          body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11pt; color: #1e293b; padding: 25px; }
+          table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+          th, td { border: 1px solid #cbd5e1; padding: 8px; text-align: left; }
+          th { background-color: #f8fafc; font-weight: bold; }
+          h2 { color: #0f172a; text-align: center; }
+        </style>
+        </head><body>
+      `;
+      const footer = `</body></html>`;
+      const blob = new Blob([header + content + footer], { type: 'application/msword;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // ==========================================================
+    // WHAT-IF SENSITIVITY & CREDIT HEALTH OPTIMIZER
+    // ==========================================================
+    const whatifSliderUtil = document.getElementById('whatif-slider-util');
+    const whatifSliderIncome = document.getElementById('whatif-slider-income');
+    const whatifValUtil = document.getElementById('whatif-val-util');
+    const whatifValIncome = document.getElementById('whatif-val-income');
+    const whatifRiskDisplay = document.getElementById('whatif-risk-display');
+    const whatifDeltaDisplay = document.getElementById('whatif-delta-display');
+    const whatifStatusBadge = document.getElementById('whatif-status-badge');
+
+    function updateWhatIfSimulator() {
+      const deltaUtil = parseFloat(whatifSliderUtil.value) || 0;
+      const deltaIncome = parseFloat(whatifSliderIncome.value) || 0;
+
+      whatifValUtil.textContent = deltaUtil > 0 ? `-${deltaUtil}%` : `-0%`;
+      whatifValIncome.textContent = deltaIncome > 0 ? `+${formatINR(deltaIncome)}` : `+₹0`;
+
+      const income = (parseFloat(inIncome.value) || 600000) + deltaIncome;
+      const loan = parseFloat(inLoan.value) || 200000;
+      const score = parseFloat(inScore.value) || 680;
+      const baseUtil = parseFloat(inUtil.value) || 30;
+      const util = Math.max(0.01, (baseUtil - deltaUtil) / 100.0);
+      const dti = parseFloat(inDti.value) / 100.0;
+      const delinq = parseInt(inDelinq.value) || 0;
+      const rate = parseFloat(inRate.value) || 10.0;
+      const emp = parseFloat(inEmp.value) || 4;
+
+      const income_to_loan = income / Math.max(loan, 1);
+      const credit_deficit = Math.max(0, 850 - score) / 100.0;
+      const revolving_stress = util * credit_deficit;
+      const delinquency_severity = delinq * (1.0 + dti);
+
+      let z = -2.85;
+      z += 4.5 * (dti - 0.28);
+      z += 3.8 * (revolving_stress - 0.45);
+      z -= 0.015 * (score - 670);
+      z += 0.65 * delinquency_severity;
+      z += 0.08 * (rate - 11.5);
+      z -= 0.035 * emp;
+      if (income_to_loan < 2.5) z += 0.45 * (2.5 - income_to_loan);
+
+      let prob = 1.0 / (1.0 + Math.exp(-z));
+      prob = Math.min(0.999, Math.max(0.005, prob));
+      const probPct = (prob * 100).toFixed(1);
+
+      whatifRiskDisplay.textContent = `${probPct}%`;
+
+      const baselineProb = parseFloat(gaugeValue.textContent) || 2.4;
+      const delta = (prob * 100) - baselineProb;
+      if (Math.abs(delta) < 0.1) {
+        whatifDeltaDisplay.textContent = '(Baseline)';
+        whatifDeltaDisplay.className = 'font-mono text-[11px] text-slate-500 font-semibold';
+      } else if (delta < 0) {
+        whatifDeltaDisplay.textContent = `(${delta.toFixed(1)}% Risk Reduced)`;
+        whatifDeltaDisplay.className = 'font-mono text-[11px] text-emerald-600 font-semibold';
+      } else {
+        whatifDeltaDisplay.textContent = `(+${delta.toFixed(1)}% Risk Increased)`;
+        whatifDeltaDisplay.className = 'font-mono text-[11px] text-rose-600 font-semibold';
+      }
+
+      if (prob < 0.35) {
+        whatifStatusBadge.className = "px-2.5 py-1 rounded font-bold text-[11px] bg-emerald-100 text-emerald-800 border border-emerald-200";
+        whatifStatusBadge.textContent = "APPROVED";
+      } else {
+        whatifStatusBadge.className = "px-2.5 py-1 rounded font-bold text-[11px] bg-rose-100 text-rose-800 border border-rose-200";
+        whatifStatusBadge.textContent = "DECLINED";
+      }
+    }
+
+    if (whatifSliderUtil && whatifSliderIncome) {
+      whatifSliderUtil.addEventListener('input', updateWhatIfSimulator);
+      whatifSliderIncome.addEventListener('input', updateWhatIfSimulator);
+    }
+
   </script>
-  <!-- ==================== OFFICIAL SANCTION / ADVERSE ACTION LETTER MODAL ==================== -->
-  <div id="doc-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
-      
-      <!-- Modal Header (Non-printing controls) -->
-      <div class="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-        <div class="flex items-center space-x-2">
-          <i data-lucide="award" class="w-5 h-5 text-blue-800"></i>
-          <span class="text-xs font-bold text-slate-800 uppercase tracking-wider">Official Credit Memorandum Preview</span>
-        </div>
-        <div class="flex items-center space-x-2">
-          <button onclick="window.print()" class="px-3 py-1.5 rounded-lg bg-blue-800 hover:bg-blue-900 text-white text-xs font-bold flex items-center space-x-1.5 shadow-2xs transition">
-            <i data-lucide="printer" class="w-3.5 h-3.5"></i>
-            <span>Print / Save PDF</span>
-          </button>
-          <button onclick="closeDocumentModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition">
-            <i data-lucide="x" class="w-4 h-4"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- Printable Document Container -->
-      <div id="printable-doc" class="p-8 overflow-y-auto space-y-6 text-slate-800 font-sans text-xs bg-white">
-        
-        <!-- Letterhead -->
-        <div class="flex items-start justify-between border-b-2 border-slate-900 pb-5">
-          <div class="space-y-1">
-            <div class="flex items-center space-x-2">
-              <span class="text-xl font-black text-blue-950 tracking-tight font-serif">FinShield Bank</span>
-              <span class="px-1.5 py-0.5 rounded bg-blue-100 text-blue-900 text-[10px] font-bold">RBI Regulated NBFC-ICC</span>
-            </div>
-            <p class="text-[11px] text-slate-500">Institutional Credit Underwriting & Risk Advisory Department</p>
-            <p class="text-[10px] text-slate-400">Head Office: FinShield Tower, Bandra Kurla Complex (BKC), Mumbai 400051</p>
-          </div>
-          <div class="text-right space-y-1 font-mono text-[11px]">
-            <p class="font-bold text-slate-900" id="doc-ref-id">REF: FIN/2026/0942</p>
-            <p class="text-slate-500" id="doc-date">Date: 19-Nov-2026</p>
-            <span id="doc-badge-status" class="inline-block px-2.5 py-1 rounded text-xs font-bold uppercase"></span>
-          </div>
-        </div>
-
-        <!-- Title -->
-        <div class="text-center py-2">
-          <h2 id="doc-title" class="text-base font-extrabold text-slate-900 tracking-wide uppercase font-serif"></h2>
-          <p id="doc-subtitle" class="text-[11px] text-slate-500 mt-0.5"></p>
-        </div>
-
-        <!-- Applicant Summary Table -->
-        <div class="space-y-2">
-          <h4 class="text-[11px] font-bold uppercase tracking-wider text-slate-700">Applicant Credit Evaluation Profile</h4>
-          <table class="w-full border-collapse border border-slate-200 text-left text-xs">
-            <tr class="bg-slate-50">
-              <th class="border border-slate-200 p-2 font-semibold text-slate-600">Applicant Annual Income:</th>
-              <td class="border border-slate-200 p-2 font-mono font-bold" id="doc-income">₹18,00,000</td>
-              <th class="border border-slate-200 p-2 font-semibold text-slate-600">Loan Facility Requested:</th>
-              <td class="border border-slate-200 p-2 font-mono font-bold" id="doc-loan">₹4,00,000</td>
-            </tr>
-            <tr>
-              <th class="border border-slate-200 p-2 font-semibold text-slate-600">CIBIL / Credit Bureau Score:</th>
-              <td class="border border-slate-200 p-2 font-mono font-bold" id="doc-score">780</td>
-              <th class="border border-slate-200 p-2 font-semibold text-slate-600">Debt-to-Income (DTI):</th>
-              <td class="border border-slate-200 p-2 font-mono font-bold" id="doc-dti">18%</td>
-            </tr>
-            <tr class="bg-slate-50">
-              <th class="border border-slate-200 p-2 font-semibold text-slate-600">Credit Card Utilization:</th>
-              <td class="border border-slate-200 p-2 font-mono font-bold" id="doc-util">12%</td>
-              <th class="border border-slate-200 p-2 font-semibold text-slate-600">Delinquencies (Past 24m):</th>
-              <td class="border border-slate-200 p-2 font-mono font-bold" id="doc-delinq">0 Incidents</td>
-            </tr>
-          </table>
-        </div>
-
-        <!-- Dynamic Body Content (Sanction Terms OR Adverse Action Disclosures) -->
-        <div id="doc-body-section" class="space-y-3">
-          <!-- Populated dynamically -->
-        </div>
-
-        <!-- Sign-off & Regulatory Hash -->
-        <div class="pt-6 border-t border-slate-200 flex items-end justify-between">
-          <div class="space-y-1">
-            <p class="font-bold text-slate-900">Autonomous Risk Underwriting System (FinShield AI)</p>
-            <p class="text-[10px] text-slate-500">Calibrated GBDT Engine &bull; Validated by Chief Risk Officer (CRO)</p>
-            <p class="text-[10px] font-mono text-slate-400">Cryptographic Decision Hash: <span id="doc-hash">0x8a92f0...4c</span></p>
-          </div>
-          <div class="text-right">
-            <div class="inline-block border-b border-slate-400 pb-1 px-4 mb-1">
-              <span class="font-serif italic text-blue-900 text-sm font-bold">Authorized Signatory</span>
-            </div>
-            <p class="text-[10px] text-slate-500">Credit Risk & Regulatory Compliance</p>
-          </div>
-        </div>
-
-      </div>
+  
 
     </div>
   </div>
