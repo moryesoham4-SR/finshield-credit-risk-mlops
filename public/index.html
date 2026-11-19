@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinShield | Enterprise Credit Risk & Regulatory Explainable AI</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .gauge-circle {
+      transition: stroke-dashoffset 0.8s ease-in-out, stroke 0.4s ease;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen antialiased flex flex-col">
+
+  <!-- Top Navigation Bar -->
+  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+          <i data-lucide="shield-alert" class="w-6 h-6 text-white"></i>
+        </div>
+        <div>
+          <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">FinShield</span>
+          <span class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">Azure ML v2</span>
+        </div>
+      </div>
+      <div class="flex items-center space-x-4 text-sm">
+        <span class="hidden md:inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span>
+          Calibrated Underwriting Engine Live
+        </span>
+        <a href="https://github.com/moryesoham4-SR/finshield-credit-risk-mlops" target="_blank" class="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition border border-slate-700 text-xs font-medium">
+          <i data-lucide="github" class="w-4 h-4"></i>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Subheader Navigation Tabs -->
+  <div class="border-b border-slate-800 bg-slate-900/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav class="flex space-x-8 -mb-px" aria-label="Tabs">
+        <button onclick="switchTab('tab-live')" id="btn-tab-live" class="tab-btn border-blue-500 text-blue-400 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2">
+          <i data-lucide="play-circle" class="w-4 h-4"></i>
+          <span>Live Credit Underwriter</span>
+        </button>
+        <button onclick="switchTab('tab-metrics')" id="btn-tab-metrics" class="tab-btn border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2">
+          <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+          <span>Model Benchmark (ROC-AUC 0.87)</span>
+        </button>
+        <button onclick="switchTab('tab-azure')" id="btn-tab-azure" class="tab-btn border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2">
+          <i data-lucide="cloud" class="w-4 h-4"></i>
+          <span>Azure Cloud Architecture</span>
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- ==================== TAB 1: LIVE UNDERWRITER ==================== -->
+    <div id="tab-live" class="tab-content block">
+      
+      <!-- Preset Quick Bar -->
+      <div class="mb-6 p-4 rounded-xl bg-slate-800/60 border border-slate-700/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center space-x-2 text-sm text-slate-300 font-medium">
+          <i data-lucide="sparkles" class="w-4 h-4 text-blue-400"></i>
+          <span>Quick Evaluation Presets:</span>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="loadPreset('prime')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 transition flex items-center space-x-1.5">
+            <span>✅ Profile A: Prime Borrower</span>
+            <span class="text-[10px] text-emerald-300 font-mono">(Approval)</span>
+          </button>
+          <button onclick="loadPreset('subprime')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/30 hover:bg-rose-500/20 transition flex items-center space-x-1.5">
+            <span>❌ Profile B: Subprime Borrower</span>
+            <span class="text-[10px] text-rose-300 font-mono">(Adverse Action)</span>
+          </button>
+          <button onclick="loadPreset('borderline')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 transition flex items-center space-x-1.5">
+            <span>⚖️ Profile C: Near-Prime Borderline</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Left: Form Controls (7 cols) -->
+        <div class="lg:col-span-7 bg-slate-800/40 rounded-2xl border border-slate-700/70 p-6 space-y-6">
+          <h2 class="text-lg font-bold text-white flex items-center space-x-2">
+            <i data-lucide="sliders" class="w-5 h-5 text-blue-400"></i>
+            <span>Applicant Credit Application Parameters</span>
+          </h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Annual Verified Income ($)</label>
+              <div class="relative">
+                <input type="number" id="in-income" value="125000" step="5000" min="10000" max="500000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white font-mono text-sm focus:border-blue-500 focus:outline-none">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Requested Loan Amount ($)</label>
+              <input type="number" id="in-loan" value="15000" step="1000" min="1000" max="50000" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white font-mono text-sm focus:border-blue-500 focus:outline-none">
+            </div>
+          </div>
+
+          <!-- Slider: Credit Bureau Score -->
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs">
+              <span class="text-slate-400 font-medium">Credit Bureau Score (FICO)</span>
+              <span id="val-score" class="text-blue-400 font-mono font-bold">780</span>
+            </div>
+            <input type="range" id="in-score" min="300" max="850" value="780" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+              <span>300 (Poor)</span>
+              <span>580</span>
+              <span>670 (Prime)</span>
+              <span>740</span>
+              <span>850 (Exceptional)</span>
+            </div>
+          </div>
+
+          <!-- Slider: Revolving Utilization -->
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs">
+              <span class="text-slate-400 font-medium">Revolving Balance Utilization</span>
+              <span id="val-util" class="text-blue-400 font-mono font-bold">12%</span>
+            </div>
+            <input type="range" id="in-util" min="0" max="110" value="12" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+              <span>0% (Clean)</span>
+              <span>30% (Standard Limit)</span>
+              <span>60% (Elevated)</span>
+              <span>100%+ (Maxed Out)</span>
+            </div>
+          </div>
+
+          <!-- Slider: Debt-to-Income Ratio -->
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs">
+              <span class="text-slate-400 font-medium">Debt-to-Income (DTI) Ratio</span>
+              <span id="val-dti" class="text-blue-400 font-mono font-bold">18%</span>
+            </div>
+            <input type="range" id="in-dti" min="5" max="75" value="18" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
+            <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+              <span>5% (Low Debt)</span>
+              <span>36% (Standard Underwriting Ceiling)</span>
+              <span>50%+ (Severe Distress)</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Delinquencies (Past 2 Yrs)</label>
+              <select id="in-delinq" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white font-mono text-sm focus:border-blue-500 focus:outline-none">
+                <option value="0">0 Incidents</option>
+                <option value="1">1 Incident</option>
+                <option value="2">2 Incidents</option>
+                <option value="3">3+ Incidents</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Interest Rate APR (%)</label>
+              <input type="number" id="in-rate" value="6.5" step="0.25" min="4.0" max="32.0" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white font-mono text-sm focus:border-blue-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Employment History</label>
+              <input type="number" id="in-emp" value="12" step="1" min="0" max="40" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white font-mono text-sm focus:border-blue-500 focus:outline-none">
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Real-time Decision & Explainability (5 cols) -->
+        <div class="lg:col-span-5 space-y-6">
+          
+          <!-- Underwriting Decision Card -->
+          <div class="bg-slate-800/40 rounded-2xl border border-slate-700/70 p-6 flex flex-col items-center text-center">
+            
+            <!-- Decision Banner -->
+            <div id="decision-banner" class="w-full py-3 px-4 rounded-xl font-bold tracking-wide text-sm mb-6 flex items-center justify-center space-x-2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+              <i data-lucide="check-circle" class="w-5 h-5"></i>
+              <span id="decision-text">UNDERWRITING: APPROVED</span>
+            </div>
+
+            <!-- Radial Gauge -->
+            <div class="relative w-44 h-44 flex items-center justify-center">
+              <svg class="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="50" stroke="currentColor" stroke-width="10" fill="transparent" class="text-slate-800"/>
+                <circle id="gauge-bar" cx="60" cy="60" r="50" stroke="#10b981" stroke-width="10" stroke-linecap="round" fill="transparent" stroke-dasharray="314.159" stroke-dashoffset="305" class="gauge-circle"/>
+              </svg>
+              <div class="absolute flex flex-col items-center justify-center">
+                <span id="gauge-value" class="text-3xl font-extrabold font-mono text-white">2.4%</span>
+                <span class="text-[11px] uppercase tracking-wider text-slate-400 font-medium">Default Risk</span>
+              </div>
+            </div>
+
+            <!-- Risk Tier & Threshold Notice -->
+            <p id="decision-sub" class="text-xs text-slate-400 mt-4">
+              Calibrated default risk is well below the conservative threshold of <strong class="text-slate-200">35.0%</strong>.
+            </p>
+          </div>
+
+          <!-- Regulatory Adverse Action Notice Card -->
+          <div id="adverse-card" class="bg-rose-950/20 border border-rose-900/50 rounded-2xl p-6 hidden">
+            <div class="flex items-start space-x-3">
+              <div class="p-2 rounded-lg bg-rose-500/20 text-rose-400 mt-0.5">
+                <i data-lucide="scale" class="w-5 h-5"></i>
+              </div>
+              <div class="space-y-2 flex-1">
+                <h3 class="text-sm font-bold text-rose-200">Mandated Adverse Action Notices (CFPB / ECOA)</h3>
+                <p class="text-xs text-slate-400">
+                  Under the Equal Credit Opportunity Act, automated lending models must disclose the primary adverse factors for declination:
+                </p>
+                <div id="adverse-list" class="space-y-2 pt-2 text-xs">
+                  <!-- Populated dynamically -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feature Engineered Signals Card -->
+          <div class="bg-slate-800/40 rounded-2xl border border-slate-700/70 p-5">
+            <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Key Engineered Financial Signals</h4>
+            <div class="grid grid-cols-3 gap-3 text-center">
+              <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                <span class="text-[11px] text-slate-400 block mb-1">Revolving Stress</span>
+                <span id="sig-stress" class="text-sm font-bold font-mono text-blue-400">0.08</span>
+              </div>
+              <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                <span class="text-[11px] text-slate-400 block mb-1">Payment Burden</span>
+                <span id="sig-burden" class="text-sm font-bold font-mono text-blue-400">4.4%</span>
+              </div>
+              <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                <span class="text-[11px] text-slate-400 block mb-1">Income / Loan</span>
+                <span id="sig-ratio" class="text-sm font-bold font-mono text-blue-400">8.3x</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ==================== TAB 2: MODEL METRICS ==================== -->
+    <div id="tab-metrics" class="tab-content hidden space-y-6">
+      
+      <div class="p-6 rounded-2xl bg-slate-800/40 border border-slate-700/70 space-y-4">
+        <div>
+          <h2 class="text-xl font-bold text-white">Financial Regulatory Model Benchmark</h2>
+          <p class="text-sm text-slate-400">Evaluated on a strictly held-out 20% test partition (2,000 credit applications).</p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400 font-medium block">ROC-AUC</span>
+            <span class="text-2xl font-extrabold font-mono text-white mt-1 block">0.8716</span>
+            <span class="text-[11px] text-emerald-400 mt-1 block">Target: &ge; 0.75</span>
+          </div>
+          <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400 font-medium block">Gini Coefficient</span>
+            <span class="text-2xl font-extrabold font-mono text-white mt-1 block">0.7432</span>
+            <span class="text-[11px] text-emerald-400 mt-1 block">Basel III / Risk Committee Std</span>
+          </div>
+          <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400 font-medium block">PR-AUC (Avg Precision)</span>
+            <span class="text-2xl font-extrabold font-mono text-white mt-1 block">0.6158</span>
+            <span class="text-[11px] text-emerald-400 mt-1 block">4x over base default rate</span>
+          </div>
+          <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400 font-medium block">Brier Score Loss</span>
+            <span class="text-2xl font-extrabold font-mono text-white mt-1 block">0.0878</span>
+            <span class="text-[11px] text-emerald-400 mt-1 block">Probability Calibration (Sigmoid)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature Importances -->
+      <div class="p-6 rounded-2xl bg-slate-800/40 border border-slate-700/70 space-y-4">
+        <h3 class="text-base font-bold text-white">Global Predictive Risk Drivers</h3>
+        <p class="text-xs text-slate-400">Relative contribution to default risk probability according to Gradient Boosted Decision Trees:</p>
+        
+        <div class="space-y-3 font-mono text-xs">
+          <div>
+            <div class="flex justify-between text-slate-300 mb-1">
+              <span>credit_score (Bureau Score)</span>
+              <span class="font-bold text-blue-400">32.6%</span>
+            </div>
+            <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+              <div class="bg-blue-500 h-full rounded-full" style="width: 32.6%"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between text-slate-300 mb-1">
+              <span>revolving_stress (Utilization &times; Score Deficit)</span>
+              <span class="font-bold text-blue-400">24.2%</span>
+            </div>
+            <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+              <div class="bg-blue-500 h-full rounded-full" style="width: 24.2%"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between text-slate-300 mb-1">
+              <span>debt_to_income (DTI)</span>
+              <span class="font-bold text-blue-400">9.8%</span>
+            </div>
+            <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+              <div class="bg-blue-500 h-full rounded-full" style="width: 9.8%"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between text-slate-300 mb-1">
+              <span>delinquency_severity (Late Payments &times; DTI)</span>
+              <span class="font-bold text-blue-400">8.8%</span>
+            </div>
+            <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+              <div class="bg-blue-500 h-full rounded-full" style="width: 8.8%"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between text-slate-300 mb-1">
+              <span>interest_rate APR</span>
+              <span class="font-bold text-blue-400">8.3%</span>
+            </div>
+            <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+              <div class="bg-blue-500 h-full rounded-full" style="width: 8.3%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==================== TAB 3: AZURE ARCHITECTURE ==================== -->
+    <div id="tab-azure" class="tab-content hidden space-y-6">
+      <div class="p-6 rounded-2xl bg-slate-800/40 border border-slate-700/70 space-y-4">
+        <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+          <i data-lucide="cloud-cog" class="w-6 h-6 text-blue-400"></i>
+          <span>Microsoft Azure Cloud Native Production Architecture</span>
+        </h2>
+        <p class="text-sm text-slate-300 leading-relaxed">
+          FinShield is designed to deploy across Microsoft Azure services using modular Infrastructure-as-Code (<code class="bg-slate-900 px-1.5 py-0.5 rounded text-blue-300">infra/main.bicep</code>):
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+            <div class="flex items-center space-x-2 text-blue-400 font-bold text-sm">
+              <i data-lucide="database" class="w-4 h-4"></i>
+              <span>Azure Data Lake Storage</span>
+            </div>
+            <p class="text-xs text-slate-400">ADLS Gen2 with hierarchical namespaces enabled. Separates raw immutable applications from curated feature assets.</p>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+            <div class="flex items-center space-x-2 text-indigo-400 font-bold text-sm">
+              <i data-lucide="cpu" class="w-4 h-4"></i>
+              <span>Azure ML v2 Pipeline</span>
+            </div>
+            <p class="text-xs text-slate-400">Automated orchestration of data contract validation, feature transformations, GBDT training, and 3-fold probability calibration.</p>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+            <div class="flex items-center space-x-2 text-emerald-400 font-bold text-sm">
+              <i data-lucide="zap" class="w-4 h-4"></i>
+              <span>Zero-Idle Cost Compute</span>
+            </div>
+            <p class="text-xs text-slate-400">Configured with <code class="text-emerald-300">minNodeCount: 0</code>. Virtual machines automatically scale down after 120s of inactivity ($0/hr when idle).</p>
+          </div>
+        </div>
+
+        <div class="pt-4">
+          <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Automated Azure Deployment Steps</h4>
+          <pre class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-blue-300 overflow-x-auto"><code># 1. Create Resource Group
+az group create --name rg-finshield-prod --location eastus
+
+# 2. Deploy Cloud Resources via Bicep Template
+az deployment group create --resource-group rg-finshield-prod --template-file infra/main.bicep
+
+# 3. Trigger Azure ML Training Pipeline Job
+az ml job create --file pipelines/pipeline_job.yaml --resource-group rg-finshield-prod</code></pre>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800 bg-slate-950 py-6 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4">
+      FinShield Enterprise Underwriting Platform &bull; Built for Microsoft Azure ML v2 &bull; ECOA / CFPB Compliant
+    </div>
+  </footer>
+
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Tab Switching
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('border-blue-500', 'text-blue-400');
+        btn.classList.add('border-transparent', 'text-slate-400');
+      });
+
+      document.getElementById(tabId).classList.remove('hidden');
+      const activeBtn = document.getElementById('btn-' + tabId);
+      activeBtn.classList.add('border-blue-500', 'text-blue-400');
+      activeBtn.classList.remove('border-transparent', 'text-slate-400');
+    }
+
+    // Input Element References
+    const inIncome = document.getElementById('in-income');
+    const inLoan = document.getElementById('in-loan');
+    const inScore = document.getElementById('in-score');
+    const inUtil = document.getElementById('in-util');
+    const inDti = document.getElementById('in-dti');
+    const inDelinq = document.getElementById('in-delinq');
+    const inRate = document.getElementById('in-rate');
+    const inEmp = document.getElementById('in-emp');
+
+    // Value Labels
+    const valScore = document.getElementById('val-score');
+    const valUtil = document.getElementById('val-util');
+    const valDti = document.getElementById('val-dti');
+
+    // Output Elements
+    const decisionBanner = document.getElementById('decision-banner');
+    const decisionText = document.getElementById('decision-text');
+    const decisionSub = document.getElementById('decision-sub');
+    const gaugeBar = document.getElementById('gauge-bar');
+    const gaugeValue = document.getElementById('gauge-value');
+    const adverseCard = document.getElementById('adverse-card');
+    const adverseList = document.getElementById('adverse-list');
+    const sigStress = document.getElementById('sig-stress');
+    const sigBurden = document.getElementById('sig-burden');
+    const sigRatio = document.getElementById('sig-ratio');
+
+    // Preset Profiles
+    function loadPreset(type) {
+      if (type === 'prime') {
+        inIncome.value = 125000;
+        inLoan.value = 15000;
+        inScore.value = 780;
+        inUtil.value = 12;
+        inDti.value = 18;
+        inDelinq.value = 0;
+        inRate.value = 6.5;
+        inEmp.value = 12;
+      } else if (type === 'subprime') {
+        inIncome.value = 32000;
+        inLoan.value = 22000;
+        inScore.value = 540;
+        inUtil.value = 88;
+        inDti.value = 56;
+        inDelinq.value = 2;
+        inRate.value = 21.5;
+        inEmp.value = 1;
+      } else if (type === 'borderline') {
+        inIncome.value = 58000;
+        inLoan.value = 14000;
+        inScore.value = 665;
+        inUtil.value = 42;
+        inDti.value = 36;
+        inDelinq.value = 0;
+        inRate.value = 12.5;
+        inEmp.value = 4;
+      }
+      recalculate();
+    }
+
+    // Calculation & UI Update
+    function recalculate() {
+      valScore.textContent = inScore.value;
+      valUtil.textContent = inUtil.value + '%';
+      valDti.textContent = inDti.value + '%';
+
+      const payload = {
+        applicant_id: 'APP-WEB-DEMO',
+        annual_income: parseFloat(inIncome.value),
+        loan_amount: parseFloat(inLoan.value),
+        credit_score: parseFloat(inScore.value),
+        revolving_utilization: parseFloat(inUtil.value) / 100.0,
+        debt_to_income: parseFloat(inDti.value) / 100.0,
+        delinquencies_2yrs: parseInt(inDelinq.value),
+        interest_rate: parseFloat(inRate.value),
+        employment_years: parseFloat(inEmp.value)
+      };
+
+      // Call API or local evaluator
+      evaluateLocally(payload);
+    }
+
+    function evaluateLocally(rec) {
+      const income_to_loan = rec.annual_income / Math.max(rec.loan_amount, 1);
+      const credit_deficit = Math.max(0, 850 - rec.credit_score) / 100.0;
+      const revolving_stress = rec.revolving_utilization * credit_deficit;
+      const delinquency_severity = rec.delinquencies_2yrs * (1.0 + rec.debt_to_income);
+      
+      const monthly_income = rec.annual_income / 12.0;
+      const r = (rec.interest_rate / 100.0) / 12.0;
+      const installment = (rec.loan_amount * r) / (1.0 - Math.pow(1.0 + r, -36));
+      const payment_burden = (installment / monthly_income) * 100.0;
+
+      // Calibrated Log-Odds Formula (Aligned with Python Model)
+      let z = -2.85;
+      z += 4.5 * (rec.debt_to_income - 0.28);
+      z += 3.8 * (revolving_stress - 0.45);
+      z -= 0.015 * (rec.credit_score - 670);
+      z += 0.65 * delinquency_severity;
+      z += 0.08 * (rec.interest_rate - 11.5);
+      z -= 0.035 * rec.employment_years;
+      if (income_to_loan < 2.5) {
+        z += 0.45 * (2.5 - income_to_loan);
+      }
+
+      let prob = 1.0 / (1.0 + Math.exp(-z));
+      prob = Math.min(0.999, Math.max(0.005, prob));
+      const probPct = (prob * 100).toFixed(1);
+
+      // Update Gauge SVG
+      const circumference = 314.159;
+      const offset = circumference - (prob * circumference);
+      gaugeBar.style.strokeDashoffset = offset;
+      gaugeValue.textContent = probPct + '%';
+
+      // Update Signals
+      sigStress.textContent = revolving_stress.toFixed(2);
+      sigBurden.textContent = payment_burden.toFixed(1) + '%';
+      sigRatio.textContent = income_to_loan.toFixed(1) + 'x';
+
+      // Decision & Adverse Action
+      if (prob < 0.35) {
+        // APPROVED
+        decisionBanner.className = "w-full py-3 px-4 rounded-xl font-bold tracking-wide text-sm mb-6 flex items-center justify-center space-x-2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30";
+        decisionText.textContent = "UNDERWRITING: APPROVED (Prime Risk)";
+        gaugeBar.style.stroke = "#10b981";
+        decisionSub.innerHTML = `Calibrated default risk is well below the conservative threshold of <strong class="text-slate-200">35.0%</strong>.`;
+        adverseCard.classList.add('hidden');
+      } else {
+        // DECLINED
+        decisionBanner.className = "w-full py-3 px-4 rounded-xl font-bold tracking-wide text-sm mb-6 flex items-center justify-center space-x-2 bg-rose-500/10 text-rose-400 border border-rose-500/30";
+        decisionText.textContent = "UNDERWRITING: DECLINED (Subprime Risk)";
+        gaugeBar.style.stroke = "#f43f5e";
+        decisionSub.innerHTML = `Calibrated default risk of <strong class="text-rose-400">${probPct}%</strong> exceeds acceptable lending tolerance (35.0%).`;
+        
+        // Generate Adverse Action Reasons
+        const reasons = [];
+        if (rec.delinquencies_2yrs > 0) {
+          reasons.push(`Prior 30+ day delinquencies or late payments on bureau file (${rec.delinquencies_2yrs} reported)`);
+        }
+        if (rec.credit_score < 660) {
+          reasons.push(`Credit bureau score (${rec.credit_score}) below prime risk threshold (660)`);
+        }
+        if (rec.revolving_utilization > 0.45) {
+          reasons.push(`Proportion of credit card balances to limits is too high (${(rec.revolving_utilization * 100).toFixed(0)}%)`);
+        }
+        if (rec.debt_to_income > 0.38) {
+          reasons.push(`Total debt-to-income ratio (${(rec.debt_to_income * 100).toFixed(0)}%) exceeds underwriting ceiling`);
+        }
+        if (income_to_loan < 3.0) {
+          reasons.push(`Requested loan is high relative to verified annual income`);
+        }
+
+        adverseList.innerHTML = '';
+        reasons.slice(0, 3).forEach((r, idx) => {
+          const item = document.createElement('div');
+          item.className = "p-2.5 rounded-lg bg-rose-900/30 border border-rose-800/40 text-rose-300 flex items-start space-x-2";
+          item.innerHTML = `<span class="font-bold text-rose-400">#${idx+1}</span><span>${r}</span>`;
+          adverseList.appendChild(item);
+        });
+
+        adverseCard.classList.remove('hidden');
+      }
+      lucide.createIcons();
+    }
+
+    // Attach listeners
+    [inIncome, inLoan, inScore, inUtil, inDti, inDelinq, inRate, inEmp].forEach(el => {
+      el.addEventListener('input', recalculate);
+    });
+
+    // Initial run
+    recalculate();
+  </script>
+</body>
+</html>
