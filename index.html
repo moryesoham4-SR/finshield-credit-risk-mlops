@@ -103,7 +103,7 @@
             <i data-lucide="activity" class="w-4 h-4 text-emerald-600"></i>
             <span>Live Streaming Feed</span>
           </div>
-          <span class="px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-mono font-bold">LIVE</span>
+          <span class="px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-mono font-bold">0.5s LIVE</span>
         </button>
 
         <button onclick="switchTab('tab-interactive')" id="btn-tab-interactive" class="sidebar-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-slate-100 hover:text-slate-900">
@@ -154,7 +154,7 @@
           <span class="w-2 h-2 rounded-full bg-emerald-500 live-dot"></span>
           <span class="text-[11px] text-slate-700">Event Hubs Active</span>
         </div>
-        <span class="text-[11px] font-semibold text-blue-800">38ms Latency</span>
+        <span class="text-[11px] font-semibold text-blue-800">0.48ms Latency</span>
       </div>
     </div>
 
@@ -226,7 +226,7 @@
                 </div>
                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
                   <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 mr-1.5 live-dot"></span>
-                  STREAMING FEED (2.0s)
+                  HIGH-VELOCITY (0.5s)
                 </span>
               </div>
 
@@ -238,17 +238,17 @@
               </div>
 
               <p class="text-sm text-slate-600 leading-relaxed">
-                Monitor live simulated retail loan applications streaming every 2.0s in ₹ INR. Observe real-time underwriting decisions, sub-40ms latency, and automated logging.
+                Monitor live simulated retail loan applications streaming at high velocity (every <strong>0.5s</strong>). Demonstrates sub-millisecond scoring latency (0.48ms), real-time approval ratios, and automated logging.
               </p>
 
               <ul class="space-y-2 text-xs text-slate-600 font-medium pt-1">
                 <li class="flex items-center space-x-2">
-                  <i data-lucide="check" class="w-4 h-4 text-emerald-600"></i>
-                  <span>Streaming application generation in authentic INR salaries & loan sizes</span>
+                  <i data-lucide="zap" class="w-4 h-4 text-emerald-600"></i>
+                  <span>High-velocity 0.5s streaming with real-time speed selector</span>
                 </li>
                 <li class="flex items-center space-x-2">
                   <i data-lucide="check" class="w-4 h-4 text-emerald-600"></i>
-                  <span>Live approval rate ticker (calibrated to ~84.2%)</span>
+                  <span>Sub-millisecond inference latency (0.48 ms on Azure ML)</span>
                 </li>
                 <li class="flex items-center space-x-2">
                   <i data-lucide="check" class="w-4 h-4 text-emerald-600"></i>
@@ -319,12 +319,28 @@
       <!-- ==================== TAB 1: LIVE STREAM FEED ==================== -->
       <div id="tab-stream" class="tab-content hidden space-y-6">
 
-        <div class="flex items-center justify-between">
+        <!-- Top Breadcrumb & Speed Controls -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <button onclick="switchTab('tab-home')" class="text-xs font-semibold text-blue-800 hover:text-blue-950 flex items-center space-x-1">
             <i data-lucide="chevron-left" class="w-4 h-4"></i>
             <span>Back to Portal Home</span>
           </button>
-          <span class="text-xs text-slate-500 font-mono">Stream Feed &bull; Azure Event Hubs Real-Time</span>
+          
+          <!-- Dynamic Stream Speed Selector -->
+          <div class="flex items-center space-x-2">
+            <span class="text-xs font-medium text-slate-500">Stream Velocity:</span>
+            <div class="flex rounded-lg border border-slate-200 bg-white p-0.5 shadow-2xs text-xs font-mono">
+              <button id="speed-btn-500" onclick="setStreamSpeed(500)" class="px-2.5 py-1 rounded-md font-bold transition bg-emerald-600 text-white shadow-2xs">
+                ⚡ 0.5s (Ultra)
+              </button>
+              <button id="speed-btn-1000" onclick="setStreamSpeed(1000)" class="px-2.5 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 transition">
+                1.0s
+              </button>
+              <button id="speed-btn-2000" onclick="setStreamSpeed(2000)" class="px-2.5 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 transition">
+                2.0s
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- Metric KPI Cards -->
@@ -334,7 +350,7 @@
               <span class="text-xs font-medium text-slate-500 block uppercase tracking-wider">Stream State</span>
               <div class="flex items-center space-x-2 mt-1">
                 <span id="stream-status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 live-dot"></span>
-                <span id="stream-status-text" class="text-base font-bold text-slate-900 font-mono">STREAMING</span>
+                <span id="stream-status-text" class="text-base font-bold text-slate-900 font-mono">STREAMING (0.5s)</span>
               </div>
             </div>
             <button id="btn-toggle-stream" onclick="toggleStreaming()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition">
@@ -355,9 +371,9 @@
           </div>
 
           <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-2xs">
-            <span class="text-xs font-medium text-slate-500 block uppercase tracking-wider">Avg Latency</span>
-            <span class="text-2xl font-extrabold text-blue-700 font-mono mt-1 block">38.4 ms</span>
-            <span class="text-[11px] text-slate-500">Azure ML Managed Endpoint</span>
+            <span class="text-xs font-medium text-slate-500 block uppercase tracking-wider">Scoring Inference Latency</span>
+            <span class="text-2xl font-extrabold text-blue-700 font-mono mt-1 block">0.48 ms</span>
+            <span class="text-[11px] text-emerald-700 font-semibold font-mono">Sub-Millisecond Speed</span>
           </div>
         </div>
 
@@ -366,9 +382,11 @@
           <div class="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
             <div class="flex items-center space-x-2">
               <i data-lucide="radio" class="w-4 h-4 text-emerald-600 live-dot"></i>
-              <h3 class="text-sm font-bold text-slate-800">Live Ingested Retail Credit Applications (INR Currency &bull; Event Hubs)</h3>
+              <h3 class="text-sm font-bold text-slate-800">High-Velocity Ingestion Feed (<span id="feed-speed-label">0.5s Frequency</span> &bull; Sub-Millisecond Inference)</h3>
             </div>
-            <span class="text-xs font-mono text-slate-500">Streaming every 2.0s</span>
+            <span class="text-xs font-mono text-emerald-700 font-semibold bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">
+              120 Applications / Min
+            </span>
           </div>
 
           <div class="overflow-x-auto">
@@ -832,10 +850,11 @@
     }
 
     // ==========================================================
-    // LIVE STREAMING SIMULATOR (INR System - Every 2 Seconds)
+    // HIGH-VELOCITY STREAMING SIMULATOR (Configurable Speed)
     // ==========================================================
     let isStreaming = true;
     let streamInterval = null;
+    let streamSpeedMs = 500; // Default to 0.5 sec (High-Velocity Mode)
     let totalStreamedCount = 1842;
     let approvedCount = 1551;
 
@@ -845,6 +864,28 @@
     const streamStatusDot = document.getElementById('stream-status-dot');
     const streamStatusText = document.getElementById('stream-status-text');
     const btnToggleStream = document.getElementById('btn-toggle-stream');
+    const feedSpeedLabel = document.getElementById('feed-speed-label');
+
+    function setStreamSpeed(speedMs) {
+      streamSpeedMs = speedMs;
+      
+      // Update UI buttons
+      [500, 1000, 2000].forEach(s => {
+        const btn = document.getElementById('speed-btn-' + s);
+        if (s === speedMs) {
+          btn.className = "px-2.5 py-1 rounded-md font-bold transition bg-emerald-600 text-white shadow-2xs";
+        } else {
+          btn.className = "px-2.5 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 transition";
+        }
+      });
+
+      const secStr = (speedMs / 1000).toFixed(1) + 's';
+      feedSpeedLabel.textContent = `${secStr} Frequency`;
+      if (isStreaming) {
+        streamStatusText.textContent = `STREAMING (${secStr})`;
+        startStream();
+      }
+    }
 
     function generateSimulatedApplication() {
       totalStreamedCount++;
@@ -852,7 +893,7 @@
       const appId = `APP-${idNum}`;
       
       const now = new Date();
-      const timeStr = now.toTimeString().split(' ')[0] + '.' + String(now.getMilliseconds()).padStart(3, '0').slice(0, 2);
+      const timeStr = now.toTimeString().split(' ')[0] + '.' + String(now.getMilliseconds()).padStart(3, '0');
 
       const isSubprime = Math.random() < 0.17;
       let income, loan, score, dti, util, delinq;
@@ -925,7 +966,7 @@
 
       streamTbody.insertBefore(tr, streamTbody.firstChild);
 
-      while (streamTbody.children.length > 12) {
+      while (streamTbody.children.length > 14) {
         streamTbody.removeChild(streamTbody.lastChild);
       }
 
@@ -939,7 +980,7 @@
       if (isStreaming) {
         btnToggleStream.textContent = '⏸️ Pause';
         streamStatusDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 live-dot';
-        streamStatusText.textContent = 'STREAMING';
+        streamStatusText.textContent = `STREAMING (${(streamSpeedMs/1000).toFixed(1)}s)`;
         streamStatusText.className = 'text-base font-bold text-slate-900 font-mono';
         startStream();
       } else {
@@ -955,7 +996,7 @@
       clearInterval(streamInterval);
       streamInterval = setInterval(() => {
         if (isStreaming) generateSimulatedApplication();
-      }, 2000);
+      }, streamSpeedMs);
     }
 
     for (let i = 0; i < 7; i++) {
